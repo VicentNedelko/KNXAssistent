@@ -9,17 +9,27 @@
     <ul class="nav flex-column">
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+                <MatIcon Icon="home"></MatIcon> Home
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
+            <NavLink class="nav-link" href="Bot/botSettings" @onclick="()=>collapseNavMenu = !collapseNavMenu">
+                <MatIcon Icon="settings_cell"></MatIcon> Bot
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="Notifications/settings">
+                <MatIcon Icon="event"></MatIcon> Notifications
             </NavLink>
         </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+                <MatIcon Icon="settings_applications"></MatIcon> Archive Settings
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="interfaces">
+                <MatIcon Icon="settings_input_composite"></MatIcon>  Interfaces
             </NavLink>
         </li>
     </ul>

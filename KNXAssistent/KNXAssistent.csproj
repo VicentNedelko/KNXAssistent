@@ -4,4 +4,12 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MatBlazor" Version="2.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\pictures\" />
+  </ItemGroup>
+
 </Project>

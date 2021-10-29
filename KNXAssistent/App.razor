@@ -1,4 +1,4 @@
-@*<Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">
+<Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
     </Found>
@@ -7,20 +7,5 @@
             <p>Sorry, there's nothing at this address.</p>
         </LayoutView>
     </NotFound>
-</Router>*@
+</Router>
 
-@using System.Threading
-
-<h4>@header</h4>
-<button @onclick="ClickedButton">Send</button>
-<p id="click-info">@clickInfo</p>
-
-@code{
-    string header = "BLAZOR";
-    string clickInfo = "Empty";
-
-    public void ClickedButton(MouseEventArgs e)
-    {
-        clickInfo = $"Button clicked - {e.Detail}";
-    }
-}

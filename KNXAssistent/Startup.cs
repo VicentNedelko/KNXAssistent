@@ -1,4 +1,5 @@
 using KNXAssistent.Data;
+using MatBlazor;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -28,6 +29,7 @@ namespace KNXAssistent
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddMatBlazor();
             services.AddSingleton<WeatherForecastService>();
         }
 
