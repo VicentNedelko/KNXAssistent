@@ -9,7 +9,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\files\" />
     <Folder Include="wwwroot\pictures\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\KNXManager\KNXManager.csproj" />
   </ItemGroup>
 
 </Project>

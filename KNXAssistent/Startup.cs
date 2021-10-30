@@ -1,4 +1,5 @@
 using KNXAssistent.Data;
+using KNXManager.BusConnection;
 using MatBlazor;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
@@ -30,6 +31,7 @@ namespace KNXAssistent
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddMatBlazor();
+            services.AddSingleton<IBusCommunicator, BusCommunicator>();
             services.AddSingleton<WeatherForecastService>();
         }
 
