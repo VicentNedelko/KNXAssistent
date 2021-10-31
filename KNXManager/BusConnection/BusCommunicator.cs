@@ -2,6 +2,7 @@
 using Knx.Bus.Common.Configuration;
 using Knx.Bus.Common.KnxIp;
 using Knx.Falcon.Sdk;
+using KNXManager.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +14,10 @@ namespace KNXManager.BusConnection
     public class BusCommunicator : IBusCommunicator
     {
         public DiscoveryResult[] Interfaces { get; set; }
-        public string Ip { get; set; }
-        public string InterfaceName { get; set; }
+
+        public KnxInterface ActiveInterface { get; set; } = new();
+        //public string Ip { get; set; }
+        //public string InterfaceName { get; set; }
         public Bus bus { get; set; }
 
         public BusCommunicator()
@@ -37,15 +40,18 @@ namespace KNXManager.BusConnection
             }
         }
 
-        public void GetInterface(string interfaceIp)
+        public void SetInterface(string interfaceIp)
         {
             if (bus is not null && bus.State == BusConnectionStatus.Connected)
             {
                 bus.Disconnect();
             }
             bus = new Bus(new KnxIpTunnelingConnectorParameters(interfaceIp, 0x057, false));
-            InterfaceName = (Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp)).FriendlyName;
-            Ip = interfaceIp;
+            bus.Connect();
+            ActiveInterface.Ip = interfaceIp;
+            ActiveInterface.Name = (Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp)).FriendlyName;
+            ActiveInterface.Mac = Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp).MacAddress.ToString();
+            ActiveInterface.IndividualAddress = Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp).IndividualAddress.ToString();
         }
     }
 }

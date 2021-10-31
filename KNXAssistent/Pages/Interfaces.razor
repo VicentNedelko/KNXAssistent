@@ -1,8 +1,50 @@
-﻿@page "/interfaces";
+﻿@page "/interfaces"
+@using KNXAssistent.Components
+@using KNXManager.Models
+@using KNXManager.BusConnection
+@inject IBusCommunicator busCommunicator
 
-
-<h3>Interfaces</h3>
+<ActiveInterface ActiveInt="@GetActiveInterface()"></ActiveInterface>
+<MatListDivider></MatListDivider>
+<InterfacesList KnxInterfaceList ="@GetInterfacesList()"></InterfacesList>
 
 @code {
+
+
+    List<KnxInterface> knxInterfaces = new();
+    KnxInterface activeInt;
+
+    private List<KnxInterface> GetInterfacesList()
+    {
+        if(busCommunicator.Interfaces.Length != 0)
+        {
+            foreach (var item in busCommunicator.Interfaces)
+            {
+                knxInterfaces.Add(
+                    new KnxInterface
+                    {
+                        Ip = item.IpAddress.ToString(),
+                        Name = item.FriendlyName,
+                        Connected = busCommunicator.CheckConnection(item.IpAddress.ToString()),
+                        Mac = item.MacAddress.ToString(),
+                        IndividualAddress = item.IndividualAddress,
+                    }
+                    );
+            }
+        }
+        return knxInterfaces;
+    }
+
+    private KnxInterface GetActiveInterface()
+    {
+        activeInt = new KnxInterface
+        {
+            Ip = busCommunicator.ActiveInterface.Ip,
+            Name = busCommunicator.ActiveInterface.Name,
+            Mac = busCommunicator.ActiveInterface.Mac,
+            IndividualAddress = busCommunicator.ActiveInterface.IndividualAddress,
+        };
+        return activeInt;
+    }
 
 }

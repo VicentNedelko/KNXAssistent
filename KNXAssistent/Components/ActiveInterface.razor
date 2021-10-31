@@ -1,0 +1,29 @@
+﻿@page "/Components/ActiveInterface"
+@using KNXManager.BusConnection
+@using KNXManager.Models
+@inject IBusCommunicator busCommunicator
+
+<h3>Active Interface</h3>
+
+<MatList>
+    <MatListItem>
+        IP Address - @ActiveInt.Ip
+    </MatListItem>
+    <MatListItem>
+        Name - @ActiveInt.Name
+    </MatListItem>
+    <MatListItem>
+        MAC Address - @ActiveInt.Mac
+    </MatListItem>
+    <MatListItem>
+        Individual Address - @ActiveInt.IndividualAddress
+    </MatListItem>
+</MatList>
+
+@code {
+
+    [Parameter]
+    public KnxInterface ActiveInt { get; set; }
+
+
+}

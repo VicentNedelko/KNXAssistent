@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KNXAssistent", "KNXAssistent\KNXAssistent.csproj", "{E1337E5A-380E-4421-91B0-5C848FA2ED4D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KNXManager", "KNXManager\KNXManager.csproj", "{3C8B7C10-ACE7-4799-90B7-6616017BCAC0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KNXManager", "KNXManager\KNXManager.csproj", "{3C8B7C10-ACE7-4799-90B7-6616017BCAC0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
