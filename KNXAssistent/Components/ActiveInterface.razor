@@ -4,29 +4,32 @@
 @inject IBusCommunicator busCommunicator
 
 <h3>Active Interface</h3>
+    @if (!String.IsNullOrEmpty(ActiveInt.Ip))
+    {
+        <MatList>
+            <MatListItem>
+                IP Address - @ActiveInt.Ip
+            </MatListItem>
+            <MatListItem>
+                Name - @ActiveInt.Name
+            </MatListItem>
+            <MatListItem>
+                MAC Address - @ActiveInt.Mac
+            </MatListItem>
+            <MatListItem>
+                Individual Address - @ActiveInt.IndividualAddress
+            </MatListItem>
+        </MatList>
+    }
+    else
+    {
+        <p>No Active interface found.</p>
+    }
 
-<MatList>
-    <MatListItem>
-        IP Address - @ActiveInt.Ip
-    </MatListItem>
-    <MatListItem>
-        Name - @ActiveInt.Name
-    </MatListItem>
-    <MatListItem>
-        MAC Address - @ActiveInt.Mac
-    </MatListItem>
-    <MatListItem>
-        Individual Address - @ActiveInt.IndividualAddress
-    </MatListItem>
-</MatList>
 
 @code {
 
     [Parameter]
     public KnxInterface ActiveInt { get; set; }
 
-    public void RefreshMe()
-    {
-        StateHasChanged();
-    }
 }

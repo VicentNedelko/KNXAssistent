@@ -5,25 +5,31 @@
 @using KNXManager.Models
 
 <h3>Available Interfaces</h3>
-
-    @if (KnxInterfaceList.Count() != 0)
-        {
-        <MatList>
-            @foreach (var knxInterface in KnxInterfaceList)
+@if(KnxInterfaceList is null)
             {
-            <MatListItem>IP - @knxInterface.Ip</MatListItem>
-            <MatListItem>Name - @knxInterface.Name</MatListItem>
-            <MatListItem>MAC - @knxInterface.Mac</MatListItem>
-            <MatListItem>Address - @knxInterface.IndividualAddress</MatListItem><MatButton Raised="true" OnClick="@(e => SetActiveIntParams(knxInterface.Ip))">Choose</MatButton>
-            <MatListDivider></MatListDivider>
+                <Chase/>
             }
-        </MatList>
-        }
+            else
+            {
+                if (KnxInterfaceList.Count() != 0)
+                {
+                    <MatList>
+                        @foreach (var knxInterface in KnxInterfaceList)
+                        {
+                            <MatListItem>IP - @knxInterface.Ip</MatListItem>
+                            <MatListItem>Name - @knxInterface.Name</MatListItem>
+                            <MatListItem>MAC - @knxInterface.Mac</MatListItem>
+                            <MatListItem>Address - @knxInterface.IndividualAddress</MatListItem><MatButton Raised="true" OnClick="@(e => SetActiveIntParams(knxInterface.Ip))">Choose</MatButton>
+                            <MatListDivider></MatListDivider>
+                        }
+                    </MatList>
+                }
 
-        else
-        {
-            <h4>Free Interfaces not found.</h4>
-        }
+                else
+                {
+                    <p>No Free Interfaces found.</p>
+                }
+            }
 
 
 
@@ -35,21 +41,17 @@
     [Parameter]
     public List<KnxInterface> KnxInterfaceList { get; set; }
 
-    public event EventHandler OnChooseInterface;
+    [Parameter]
+    public EventCallback OnActiveIntChoose { get; set; }
 
-    private void SetActiveIntParams(string ip)
+    private async Task SetActiveIntParams(string ip)
     {
         var knxInt = busCommunicator.Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == ip);
         if(knxInt is not null)
         {
             busCommunicator.SetInterface(ip);
+            await OnActiveIntChoose.InvokeAsync();
         }
-        OnChooseInterface?.Invoke();
-    }
-
-    public void RefreshMe()
-    {
-        StateHasChanged();
     }
 
 }

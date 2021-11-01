@@ -4,39 +4,43 @@
 @using KNXManager.BusConnection
 @inject IBusCommunicator busCommunicator
 
-<ActiveInterface ActiveInt="@busCommunicator.ActiveInterface"></ActiveInterface>
-<MatListDivider></MatListDivider>
-<InterfacesList KnxInterfaceList ="@GetInterfacesList()"></InterfacesList>
+        <ActiveInterface ActiveInt="@busCommunicator.ActiveInterface"></ActiveInterface>
+        <MatListDivider></MatListDivider>
+        <InterfacesList KnxInterfaceList="@GetInterfacesList()" OnActiveIntChoose="@UpdatesComponents"></InterfacesList>
 
-@code {
+    @code {
 
 
-    List<KnxInterface> knxInterfaces;
+        List<KnxInterface> knxInterfaces;
 
-    private List<KnxInterface> GetInterfacesList()
-    {
-        knxInterfaces = new();
-        if(busCommunicator.Interfaces.Length != 0)
+        private List<KnxInterface> GetInterfacesList()
         {
-            foreach (var item in busCommunicator.Interfaces)
+            knxInterfaces = new();
+            if (busCommunicator.Interfaces.Length != 0)
             {
-                if(item.IpAddress.ToString() != busCommunicator.ActiveInterface.Ip)
+                foreach (var item in busCommunicator.Interfaces)
                 {
-                    knxInterfaces.Add(
-                        new KnxInterface
-                        {
-                            Ip = item.IpAddress.ToString(),
-                            Name = item.FriendlyName,
-                            Connected = busCommunicator.CheckConnection(item.IpAddress.ToString()),
-                            Mac = item.MacAddress.ToString(),
-                            IndividualAddress = item.IndividualAddress,
-                        }
-                    );
+                    if (item.IpAddress.ToString() != busCommunicator.ActiveInterface.Ip)
+                    {
+                        knxInterfaces.Add(
+                            new KnxInterface
+                            {
+                                Ip = item.IpAddress.ToString(),
+                                Name = item.FriendlyName,
+                                Connected = busCommunicator.CheckConnection(item.IpAddress.ToString()),
+                                Mac = item.MacAddress.ToString(),
+                                IndividualAddress = item.IndividualAddress,
+                            }
+                        );
+                    }
+
                 }
-
             }
+            return knxInterfaces;
         }
-        return knxInterfaces;
-    }
+        private void UpdatesComponents()
+        {
+            StateHasChanged();
+        }
 
-}
+    }
