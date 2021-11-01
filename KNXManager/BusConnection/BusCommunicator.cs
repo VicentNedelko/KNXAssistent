@@ -47,7 +47,7 @@ namespace KNXManager.BusConnection
                 bus.Disconnect();
             }
             bus = new Bus(new KnxIpTunnelingConnectorParameters(interfaceIp, 0x057, false));
-            bus.Connect();
+            
             ActiveInterface.Ip = interfaceIp;
             ActiveInterface.Name = (Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp)).FriendlyName;
             ActiveInterface.Mac = Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp).MacAddress.ToString();

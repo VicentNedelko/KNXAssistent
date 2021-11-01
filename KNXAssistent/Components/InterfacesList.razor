@@ -1,27 +1,30 @@
 ﻿@page "/Components/InterfaceList"
+@inject IBusCommunicator busCommunicator
 
+@using KNXManager.BusConnection
 @using KNXManager.Models
 
 <h3>Available Interfaces</h3>
 
-
-@if (KnxInterfaceList.Count() != 0)
-{
-    <MatList>
-        @foreach (var knxInterface in KnxInterfaceList)
+    @if (KnxInterfaceList.Count() != 0)
         {
-        <MatListItem>@knxInterface.Ip</MatListItem>
-        <MatListItem>@knxInterface.Name</MatListItem>
-        <MatListItem>@knxInterface.Connected</MatListItem>
-        <MatListDivider></MatListDivider>
+        <MatList>
+            @foreach (var knxInterface in KnxInterfaceList)
+            {
+            <MatListItem>IP - @knxInterface.Ip</MatListItem>
+            <MatListItem>Name - @knxInterface.Name</MatListItem>
+            <MatListItem>MAC - @knxInterface.Mac</MatListItem>
+            <MatListItem>Address - @knxInterface.IndividualAddress</MatListItem><MatButton Raised="true" OnClick="@(e => SetActiveIntParams(knxInterface.Ip))">Choose</MatButton>
+            <MatListDivider></MatListDivider>
+            }
+        </MatList>
         }
-    </MatList>
-}
 
-else
-{
-    <h4>Interfaces not found.</h4>
-}
+        else
+        {
+            <h4>Free Interfaces not found.</h4>
+        }
+
 
 
 
@@ -31,5 +34,22 @@ else
 
     [Parameter]
     public List<KnxInterface> KnxInterfaceList { get; set; }
+
+    public event EventHandler OnChooseInterface;
+
+    private void SetActiveIntParams(string ip)
+    {
+        var knxInt = busCommunicator.Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == ip);
+        if(knxInt is not null)
+        {
+            busCommunicator.SetInterface(ip);
+        }
+        OnChooseInterface?.Invoke();
+    }
+
+    public void RefreshMe()
+    {
+        StateHasChanged();
+    }
 
 }

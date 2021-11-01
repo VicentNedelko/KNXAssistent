@@ -25,5 +25,8 @@
     [Parameter]
     public KnxInterface ActiveInt { get; set; }
 
-
+    public void RefreshMe()
+    {
+        StateHasChanged();
+    }
 }
