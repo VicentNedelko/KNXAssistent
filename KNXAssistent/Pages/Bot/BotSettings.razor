@@ -1,7 +1,52 @@
 ﻿@page "/Bot/botSettings";
+@using KNXManager.Models
+@using KNXManager.Models.Enums
 
-<h3>BotSettings</h3>
+<h3>GA List fot Telegram Bot notifications</h3>
+
+<MatButton Raised="true" OnClick="@OpenDialog">New GA</MatButton>
+
+<MatDialog @bind-IsOpen="@dialogIsOpen">
+<MatDialogTitle>Add new GA</MatDialogTitle>
+<MatDialogContent>
+    <p>Enter new GA parameters</p>
+    <MatTextField @bind-Value="@valueGA"></MatTextField>
+    <MatSelect @bind-Value="@typeGA" TValue="int" Label="Type">
+        <MatOption Value="1001">switch</MatOption>
+        <MatOption Value="9001">temperature</MatOption>
+        <MatOption Value="9004">brightness</MatOption>
+        <MatOption Value="5001">percent</MatOption>
+        <MatOption Value="0">unknown</MatOption>
+        <MatOption Value="1">raw</MatOption>
+    </MatSelect>
+</MatDialogContent>
+<MatDialogActions>
+    
+</MatDialogActions>
+    <MatButton OnClick="@OkClick">OK</MatButton>
+    <MatButton OnClick="@CancelClick">Cancel</MatButton>
+</MatDialog>
 
 @code {
+    bool dialogIsOpen = false;
+    GA gA = new();
+    int typeGA;
+    string valueGA;
+
+    void OpenDialog()
+    {
+        dialogIsOpen = true;
+        gA.GAddress = null;
+    }
+
+    void OkClick()
+    {
+        
+    }
+
+    void CancelClick()
+    {
+        dialogIsOpen = false;
+    }
 
 }

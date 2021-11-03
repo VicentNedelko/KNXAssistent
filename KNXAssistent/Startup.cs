@@ -1,4 +1,5 @@
 using KNXAssistent.Data;
+using KNXManager.BotManager;
 using KNXManager.BusConnection;
 using MatBlazor;
 using Microsoft.AspNetCore.Builder;
@@ -33,6 +34,7 @@ namespace KNXAssistent
             services.AddMatBlazor();
             services.AddSingleton<IBusCommunicator, BusCommunicator>();
             services.AddSingleton<WeatherForecastService>();
+            services.AddSingleton<IBot, Bot>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
