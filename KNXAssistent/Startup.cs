@@ -1,3 +1,6 @@
+using Blazorise;
+using Blazorise.Bootstrap;
+using Blazorise.Icons.FontAwesome;
 using KNXAssistent.Data;
 using KNXManager.BotManager;
 using KNXManager.BusConnection;
@@ -35,6 +38,15 @@ namespace KNXAssistent
             services.AddSingleton<IBusCommunicator, BusCommunicator>();
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<IBot, Bot>();
+            services.AddScoped<IFileService, FileService>();
+
+            services
+              .AddBlazorise(options =>
+              {
+                  options.ChangeTextOnKeyPress = true; // optional
+              })
+              .AddBootstrapProviders()
+              .AddFontAwesomeIcons();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

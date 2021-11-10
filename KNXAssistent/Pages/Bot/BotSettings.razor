@@ -1,52 +1,136 @@
 ﻿@page "/Bot/botSettings";
 @using KNXManager.Models
 @using KNXManager.Models.Enums
+@using System.Text.RegularExpressions
 
 <h3>GA List fot Telegram Bot notifications</h3>
+<br />
+<p>@error</p>
+
+
+@if(gaSBC.Count() != 0)
+{
+    <Table Hoverable="true">
+    <TableHeader>
+        <Blazorise.TableRow>
+            <TableHeaderCell>Num</TableHeaderCell>
+            <TableHeaderCell>Address</TableHeaderCell>
+            <TableHeaderCell>Type</TableHeaderCell>
+            <TableHeaderCell>Description</TableHeaderCell>
+            <TableHeaderCell>Remove</TableHeaderCell>
+        </Blazorise.TableRow>
+    </TableHeader>
+    <TableBody>
+        @foreach(var ga in gaSBC)
+        {
+            <Blazorise.TableRow>
+                <TableRowHeader>@(gaSBC.IndexOf(ga) + 1)</TableRowHeader>
+                <TableRowCell>@ga.GAddress</TableRowCell>
+                <TableRowCell>@ga.GType</TableRowCell>
+                <TableRowCell>@ga.Description</TableRowCell>
+                <TableRowCell><MatButton Dense="true" OnClick="@(() => RemoveGA(ga.GAddress))">Remove</MatButton></TableRowCell>
+            </Blazorise.TableRow>
+        }
+    </TableBody>
+</Table>
+}
+else
+{
+    <p>GA List is empty. Add new GA.</p>
+}
+
 
 <MatButton Raised="true" OnClick="@OpenDialog">New GA</MatButton>
+@if(gaSBC.Count != 0)
+{
+    <MatButton Outlined="true" OnClick="@SaveToFile">Save To File</MatButton>
+}
 
 <MatDialog @bind-IsOpen="@dialogIsOpen">
-<MatDialogTitle>Add new GA</MatDialogTitle>
-<MatDialogContent>
-    <p>Enter new GA parameters</p>
-    <MatTextField @bind-Value="@valueGA"></MatTextField>
-    <MatSelect @bind-Value="@typeGA" TValue="int" Label="Type">
-        <MatOption Value="1001">switch</MatOption>
-        <MatOption Value="9001">temperature</MatOption>
-        <MatOption Value="9004">brightness</MatOption>
-        <MatOption Value="5001">percent</MatOption>
-        <MatOption Value="0">unknown</MatOption>
-        <MatOption Value="1">raw</MatOption>
-    </MatSelect>
-</MatDialogContent>
-<MatDialogActions>
-    
-</MatDialogActions>
+    <MatDialogTitle>Add new SBC GA</MatDialogTitle>
+    <MatDialogContent>
+        <p>Enter new GA parameters</p>
+        <MatTextField @bind-Value="@valueGA"></MatTextField>
+        <MatSelect @bind-Value="@typeGA" TValue="int" Label="Type">
+            <MatOption Value="1001">switch</MatOption>
+            <MatOption Value="9001">temperature</MatOption>
+            <MatOption Value="9004">brightness</MatOption>
+            <MatOption Value="5001">percent</MatOption>
+            <MatOption Value="0">unknown</MatOption>
+            <MatOption Value="1">raw</MatOption>
+        </MatSelect>
+        <MatTextField @bind-Value="@descriptionGA"></MatTextField>
+    </MatDialogContent>
+    <MatDialogActions>
+
+    </MatDialogActions>
     <MatButton OnClick="@OkClick">OK</MatButton>
     <MatButton OnClick="@CancelClick">Cancel</MatButton>
 </MatDialog>
 
 @code {
+    // private vars
+
     bool dialogIsOpen = false;
     GA gA = new();
     int typeGA;
     string valueGA;
+    string descriptionGA;
+    string error;
+    List<GA> gaSBC = new();
+    Regex _regex =
+        new(@"^([0-9]|[1-9][0-9]|[1-2][0-5][0-5]){1}\/([0-9]|[1-9][0-9]|[1-2][0-5][0-5]{1})\/([0-9]|[1-9][0-9]|[1-2][0-5][0-5]){1}$");
+
+    // private vars
+
 
     void OpenDialog()
     {
-        dialogIsOpen = true;
+        error = null;
+        valueGA = null;
         gA.GAddress = null;
+        gA.Description = null;
+        typeGA = 0;
+        dialogIsOpen = true;
     }
 
     void OkClick()
     {
-        
+        if (valueGA is not null)
+        {
+            if (_regex.IsMatch(valueGA))
+            {
+                gaSBC.Add(new GA
+                {
+                    GAddress = valueGA,
+                    GType = GA.IntToDpt(typeGA),
+                    Description = descriptionGA,
+                });
+            }
+            else
+            {
+                error = "GA address type doesn't match the 3-level sample - __/__/__ ";
+            }
+
+        }
+        dialogIsOpen = false;
+        StateHasChanged();
     }
 
     void CancelClick()
     {
         dialogIsOpen = false;
+    }
+
+    void SaveToFile()
+    {
+        
+    }
+
+    void RemoveGA(string gaAddress)
+    {
+        var s = gaAddress; // add code
+        StateHasChanged();
     }
 
 }
