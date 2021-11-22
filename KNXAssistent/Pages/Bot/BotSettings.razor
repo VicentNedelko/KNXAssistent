@@ -1,7 +1,9 @@
-﻿@page "/Bot/botSettings";
+﻿@page "/Bot/BotSettings";
+@using KNXAssistent.Data
 @using KNXManager.Models
 @using KNXManager.Models.Enums
 @using System.Text.RegularExpressions
+@inject IFileService fileService
 
 <h3>GA List fot Telegram Bot notifications</h3>
 <br />
@@ -28,7 +30,8 @@
                 <TableRowCell>@ga.GAddress</TableRowCell>
                 <TableRowCell>@ga.GType</TableRowCell>
                 <TableRowCell>@ga.Description</TableRowCell>
-                <TableRowCell><MatButton Dense="true" OnClick="@(() => RemoveGA(ga.GAddress))">Remove</MatButton></TableRowCell>
+                <TableRowCell><MatButton Dense="true" OnClick="() => RemoveGA(ga.GAddress)">Remove</MatButton></TableRowCell>
+                <TableRowCell><MatButton Dense=true OnClick="() => EditGA(ga.GAddress)">Edit</MatButton></TableRowCell>
             </Blazorise.TableRow>
         }
     </TableBody>
@@ -50,7 +53,7 @@ else
     <MatDialogTitle>Add new SBC GA</MatDialogTitle>
     <MatDialogContent>
         <p>Enter new GA parameters</p>
-        <MatTextField @bind-Value="@valueGA"></MatTextField>
+        <MatTextField @bind-Value="@valueGA" Label="Address _/_/_"></MatTextField>
         <MatSelect @bind-Value="@typeGA" TValue="int" Label="Type">
             <MatOption Value="1001">switch</MatOption>
             <MatOption Value="9001">temperature</MatOption>
@@ -59,7 +62,7 @@ else
             <MatOption Value="0">unknown</MatOption>
             <MatOption Value="1">raw</MatOption>
         </MatSelect>
-        <MatTextField @bind-Value="@descriptionGA"></MatTextField>
+        <MatTextField @bind-Value="@descriptionGA" Label="Description"></MatTextField>
     </MatDialogContent>
     <MatDialogActions>
 
@@ -94,6 +97,11 @@ else
         dialogIsOpen = true;
     }
 
+    void EditGA(string ga)
+    {
+        
+    }
+
     void OkClick()
     {
         if (valueGA is not null)
@@ -124,13 +132,29 @@ else
 
     void SaveToFile()
     {
-        
+        fileService.WriteSbcToFile(gaSBC);
+    }
+
+    void GetGaAtStartUp()
+    {
+        gaSBC = fileService.ReadSbcFromFile();
     }
 
     void RemoveGA(string gaAddress)
     {
         var s = gaAddress; // add code
+        var item = gaSBC.FirstOrDefault(ga => ga.GAddress == gaAddress);
+        if(item is not null)
+        {
+            gaSBC.Remove(item);
+        }
+
         StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        GetGaAtStartUp();
     }
 
 }

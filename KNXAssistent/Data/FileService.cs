@@ -27,7 +27,16 @@ namespace KNXAssistent.Data
             using StreamReader sr = new(path);
             var jsonData = sr.ReadToEnd();
             sr.Close();
-            return JsonSerializer.Deserialize<List<GA>>(jsonData);
+            List<GA> result = new();
+            try
+            {
+                result = JsonSerializer.Deserialize<List<GA>>(jsonData);
+            }
+            catch(Exception)
+            {
+                return new List<GA>();
+            }
+            return result;
         }
 
         public List<GAWithTh> ReadThFromFile()
