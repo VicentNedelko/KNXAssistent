@@ -1,17 +1,14 @@
-﻿@page "/interfaces"
+﻿
+
+@page "/Interfaces"
+@using KNXManager.BusConnection
 @using DAL.Models
 @using KNXAssistent.Components
-@using KNXManager.BusConnection
 @inject IBusCommunicator busCommunicator
 
-        <ActiveInterface ActiveInt="busCommunicator.ActiveInterface"></ActiveInterface>
-
-@*        <ActiveInterface ActiveInt="@busCommunicator.ActiveInterface"></ActiveInterface>
-        <MatListDivider></MatListDivider>
-        <InterfacesList KnxInterfaceList="@GetInterfacesList()" OnActiveIntChoose="@UpdatesComponents"></InterfacesList>*@
+    <FullInterfacesList Interfaces="@GetInterfacesList()"></FullInterfacesList>
 
     @code {
-
 
         List<KnxInterface> knxInterfaces;
 
@@ -22,7 +19,7 @@
             {
                 foreach (var item in busCommunicator.Interfaces)
                 {
-                    if (item.IpAddress.ToString() != busCommunicator.ActiveInterface.Ip)
+                    if (item.IpAddress.ToString() != busCommunicator.ActiveInt.Ip)
                     {
                         knxInterfaces.Add(
                             new KnxInterface

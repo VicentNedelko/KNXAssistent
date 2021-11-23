@@ -9,7 +9,6 @@ namespace DAL.Models
 {
     public class GA
     {
-        //public Guid Id { get; set; }
         public string GAddress { get; set; }
         public DptType? GType { get; set; }
         public string Description { get; set; }

@@ -1,0 +1,34 @@
+﻿@using DAL.Models
+
+<h4>KNX Interfaces List</h4>
+
+    @if(Interfaces.Count() != 0)
+    {
+        <MatList>
+            @foreach (var i in Interfaces)
+            {
+                <MatListItem>
+                    IP Address - @i.Ip
+                </MatListItem>
+                <MatListItem>
+                    Name - @i.Name
+                </MatListItem>
+                <MatListItem>
+                    MAC - @i.Mac
+                </MatListItem>
+            }
+        </MatList>
+    }
+    else
+    {
+        <p>No Interfaces found.</p>
+    }
+
+
+
+@code {
+
+    [Parameter]
+    public List<KnxInterface> Interfaces { get; set; }
+
+}

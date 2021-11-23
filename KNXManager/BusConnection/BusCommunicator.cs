@@ -10,7 +10,7 @@ namespace KNXManager.BusConnection
     public class BusCommunicator : IBusCommunicator
     {
         public DiscoveryResult[] Interfaces { get; set; }
-        public KnxInterface ActiveInterface { get; set; } = new();
+        public KnxInterface ActiveInt { get; set; } = new();
         public Bus bus { get; set; }
         public BusCommunicator()
         {
@@ -40,10 +40,10 @@ namespace KNXManager.BusConnection
             }
             bus = new Bus(new KnxIpTunnelingConnectorParameters(interfaceIp, 0x057, false));
 
-            ActiveInterface.Ip = interfaceIp;
-            ActiveInterface.Name = (Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp)).FriendlyName;
-            ActiveInterface.Mac = Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp).MacAddress.ToString();
-            ActiveInterface.IndividualAddress = Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp).IndividualAddress.ToString();
+            ActiveInt.Ip = interfaceIp;
+            ActiveInt.Name = (Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp)).FriendlyName;
+            ActiveInt.Mac = Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp).MacAddress.ToString();
+            ActiveInt.IndividualAddress = Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp).IndividualAddress.ToString();
         }
     }
 }
