@@ -1,8 +1,6 @@
-﻿using KNXManager.Models;
-using System;
+﻿using DAL.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace KNXAssistent.Data
 {

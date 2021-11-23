@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KNXManager.Models
+namespace DAL.Models
 {
     public class KnxInterface
     {

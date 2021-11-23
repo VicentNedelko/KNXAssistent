@@ -1,11 +1,6 @@
-﻿using Knx.Bus.Common.KnxIp;
+﻿using DAL.Models;
+using Knx.Bus.Common.KnxIp;
 using Knx.Falcon.Sdk;
-using KNXManager.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KNXManager.BusConnection
 {

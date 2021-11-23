@@ -1,5 +1,5 @@
-﻿using KNXManager.Globals;
-using KNXManager.Models;
+﻿using DAL.Models;
+using KNXManager.Globals;
 using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;

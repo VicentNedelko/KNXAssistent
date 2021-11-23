@@ -1,12 +1,14 @@
 ﻿@page "/interfaces"
+@using DAL.Models
 @using KNXAssistent.Components
-@using KNXManager.Models
 @using KNXManager.BusConnection
 @inject IBusCommunicator busCommunicator
 
-        <ActiveInterface ActiveInt="@busCommunicator.ActiveInterface"></ActiveInterface>
+        <ActiveInterface ActiveInt="busCommunicator.ActiveInterface"></ActiveInterface>
+
+@*        <ActiveInterface ActiveInt="@busCommunicator.ActiveInterface"></ActiveInterface>
         <MatListDivider></MatListDivider>
-        <InterfacesList KnxInterfaceList="@GetInterfacesList()" OnActiveIntChoose="@UpdatesComponents"></InterfacesList>
+        <InterfacesList KnxInterfaceList="@GetInterfacesList()" OnActiveIntChoose="@UpdatesComponents"></InterfacesList>*@
 
     @code {
 

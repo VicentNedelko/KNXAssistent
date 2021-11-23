@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KNXManager.Models.Enums
+namespace DAL.Enums
 {
     public enum DptType
     {

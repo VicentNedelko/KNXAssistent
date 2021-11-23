@@ -1,8 +1,9 @@
 ﻿@page "/Components/InterfaceList"
 @inject IBusCommunicator busCommunicator
 
+@using DAL.Models
 @using KNXManager.BusConnection
-@using KNXManager.Models
+
 
 <h3>Available Interfaces</h3>
 @if(KnxInterfaceList is null)
@@ -24,16 +25,11 @@
                         }
                     </MatList>
                 }
-
                 else
                 {
                     <p>No Free Interfaces found.</p>
                 }
             }
-
-
-
-
 
 
 @code {
