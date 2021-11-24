@@ -1,4 +1,6 @@
 ﻿@using DAL.Models
+@using KNXManager.BusConnection
+@inject IBusCommunicator busCommunicator
 
 <h4>KNX Interfaces List</h4>
 
@@ -16,7 +18,7 @@
                 <MatListItem>
                     MAC - @i.Mac
                 </MatListItem>
-            }
+                <MatButton Raised="true" OnClick="@(() => OnBtnSelectPress(i.Ip))">Select</MatButton>            }
         </MatList>
     }
     else
@@ -30,5 +32,15 @@
 
     [Parameter]
     public List<KnxInterface> Interfaces { get; set; }
+
+    [Parameter]
+    public EventCallback OnInterfaceSelected { get; set; }
+
+    async Task OnBtnSelectPress(string ip)
+    {
+        busCommunicator.SetInterface(ip);
+        await OnInterfaceSelected.InvokeAsync();
+    }
+
 
 }

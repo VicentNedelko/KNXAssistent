@@ -1,0 +1,42 @@
+﻿@using KNXManager.BusConnection
+@using DAL.Models
+@inject IBusCommunicator busCommunicator
+
+<h4>Active Interface</h4>
+
+@if(!String.IsNullOrEmpty(Interface.Ip))
+{
+    <MatList>
+        <MatListItem>IP - @Interface.Ip</MatListItem>
+        <MatListItem>Name - @Interface.Name</MatListItem>
+        <MatListItem>MAC - @Interface.Mac</MatListItem>
+    </MatList>
+    <MatButton OnClick="@RemoveInt">Remove</MatButton>
+}
+else
+{
+    <p>No active Interface selected.</p>
+}
+
+
+
+
+@code {
+    [Parameter]
+    public KnxInterface Interface { get; set; }
+
+    [Parameter]
+    public EventCallback OnRemove { get; set; }
+
+    async Task RemoveInt()
+    {
+        Interface.Ip = string.Empty;
+        Interface.Name = string.Empty;
+        Interface.Mac = string.Empty;
+        busCommunicator.ActiveInt.Ip = string.Empty;
+        busCommunicator.ActiveInt.Name = string.Empty;
+        busCommunicator.ActiveInt.Mac = string.Empty;
+        await OnRemove.InvokeAsync();
+    }
+
+}

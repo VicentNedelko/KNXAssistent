@@ -1,16 +1,16 @@
-﻿
-
-@page "/Interfaces"
+﻿@page "/Interfaces"
 @using KNXManager.BusConnection
 @using DAL.Models
 @using KNXAssistent.Components
 @inject IBusCommunicator busCommunicator
-
-    <FullInterfacesList Interfaces="@GetInterfacesList()"></FullInterfacesList>
+    
+    <ActiveInterface Interface="@busCommunicator.ActiveInt" OnRemove="@InterfaceSelected"></ActiveInterface>
+    <MatDivider></MatDivider>
+    <FullInterfacesList Interfaces="@GetInterfacesList()" OnInterfaceSelected="@InterfaceSelected"></FullInterfacesList>
 
     @code {
 
-        List<KnxInterface> knxInterfaces;
+    List<KnxInterface> knxInterfaces;
 
         private List<KnxInterface> GetInterfacesList()
         {
@@ -37,9 +37,10 @@
             }
             return knxInterfaces;
         }
-        private void UpdatesComponents()
-        {
-            StateHasChanged();
-        }
+
+    void InterfaceSelected()
+    {
+        StateHasChanged();
+    }
 
     }
