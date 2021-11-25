@@ -1,0 +1,13 @@
+﻿@page "/Bot/botMonitor";
+
+<h4>Bot Monitor Logger</h4>
+
+        <MatVirtualScroll style="height: 500px;" ItemType="string" Items="@items" ItemHeight="50">
+            <ItemTemplate>
+                <div>@context</div>
+            </ItemTemplate>
+        </MatVirtualScroll>
+
+@code {
+
+}

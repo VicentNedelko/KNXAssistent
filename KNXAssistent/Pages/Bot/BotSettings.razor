@@ -2,40 +2,51 @@
 @using DAL.Models
 @using KNXAssistent.Data
 @using System.Text.RegularExpressions
+@using System.Threading
 @inject IFileService fileService
 
-<h3>GA List fot Telegram Bot notifications</h3>
+<h3>GA List for Telegram Bot notifications</h3>
 <br />
 <p>@error</p>
 
+<Alert Color="Color.Success" @ref="InfoAlert">
+    <AlertDescription>
+        Info.
+    </AlertDescription>
+    <AlertMessage>
+        GA List saved successfully.
+    </AlertMessage>
+    <CloseButton />
+</Alert>
 
-@if(gaSBC.Count() != 0)
+
+@if (gaSBC.Count() != 0)
 {
     <Table Hoverable="true">
-    <TableHeader>
-        <Blazorise.TableRow>
-            <TableHeaderCell>Num</TableHeaderCell>
-            <TableHeaderCell>Address</TableHeaderCell>
-            <TableHeaderCell>Type</TableHeaderCell>
-            <TableHeaderCell>Description</TableHeaderCell>
-            <TableHeaderCell>Remove</TableHeaderCell>
-            <TableHeaderCell>Edit</TableHeaderCell>
-        </Blazorise.TableRow>
-    </TableHeader>
-    <TableBody>
-        @foreach(var ga in gaSBC)
-        {
+        <TableHeader>
             <Blazorise.TableRow>
-                <TableRowHeader>@(gaSBC.IndexOf(ga) + 1)</TableRowHeader>
-                <TableRowCell>@ga.GAddress</TableRowCell>
-                <TableRowCell>@ga.GType</TableRowCell>
-                <TableRowCell>@ga.Description</TableRowCell>
-                <TableRowCell><MatButton Dense="true" OnClick="() => RemoveGA(ga.GAddress)">Remove</MatButton></TableRowCell>
-                <TableRowCell><MatButton Dense=true OnClick="() => EditGA(ga.GAddress)">Edit</MatButton></TableRowCell>
+                <TableHeaderCell>Num</TableHeaderCell>
+                <TableHeaderCell>Address</TableHeaderCell>
+                <TableHeaderCell>Type</TableHeaderCell>
+                <TableHeaderCell>Description</TableHeaderCell>
+                <TableHeaderCell>Remove</TableHeaderCell>
+                <TableHeaderCell>Edit</TableHeaderCell>
             </Blazorise.TableRow>
-        }
-    </TableBody>
-</Table>
+        </TableHeader>
+        <TableBody>
+            @foreach (var ga in gaSBC)
+            {
+                <Blazorise.TableRow>
+                    <TableRowHeader>@(gaSBC.IndexOf(ga) + 1)</TableRowHeader>
+                    <TableRowCell>@ga.GAddress</TableRowCell>
+                    <TableRowCell>@ga.GType</TableRowCell>
+                    <TableRowCell>@ga.Description</TableRowCell>
+                    <TableRowCell><MatButton Dense="true" OnClick="() => RemoveGA(ga.GAddress)">Remove</MatButton></TableRowCell>
+                    <TableRowCell><MatButton Dense=true OnClick="() => EditGA(ga.GAddress)">Edit</MatButton></TableRowCell>
+                </Blazorise.TableRow>
+            }
+        </TableBody>
+    </Table>
 }
 else
 {
@@ -44,7 +55,7 @@ else
 
 
 <MatButton Raised="true" OnClick="@OpenDialog">New GA</MatButton>
-@if(gaSBC.Count != 0)
+@if (gaSBC.Count != 0)
 {
     <MatButton Outlined="true" OnClick="@SaveToFile">Save To File</MatButton>
 }
@@ -65,16 +76,42 @@ else
         <MatTextField @bind-Value="@descriptionGA" Label="Description"></MatTextField>
     </MatDialogContent>
     <MatDialogActions>
-
+        <MatButton OnClick="@OkClick">OK</MatButton>
+        <MatButton OnClick="@CancelClick">Cancel</MatButton>
     </MatDialogActions>
-    <MatButton OnClick="@OkClick">OK</MatButton>
-    <MatButton OnClick="@CancelClick">Cancel</MatButton>
+
 </MatDialog>
+
+<MatDialog @bind-IsOpen="@editIsOpen">
+    <MatDialogTitle>Edit GA</MatDialogTitle>
+    <MatDialogContent>
+        <p>Edit</p>
+        <MatTextField Disabled="true" Value="@valueGA"></MatTextField>
+        <MatSelect @bind-Value="@typeGA" TValue="int" Label="Type">
+            <MatOption Value="1001">switch</MatOption>
+            <MatOption Value="9001">temperature</MatOption>
+            <MatOption Value="9004">brightness</MatOption>
+            <MatOption Value="5001">percent</MatOption>
+            <MatOption Value="0">unknown</MatOption>
+            <MatOption Value="1">raw</MatOption>
+        </MatSelect>
+        <MatTextField @bind-Value="@descriptionGA" Label="Description"></MatTextField>
+        <MatDialogActions>
+            <MatButton OnClick="@EditClick">Edit</MatButton>
+            <MatButton OnClick="@CancelEditClick">Cancel</MatButton>
+        </MatDialogActions>
+    </MatDialogContent>
+</MatDialog>
+
 
 @code {
     // private vars
 
     bool dialogIsOpen = false;
+    bool editIsOpen = false;
+    bool alertOpen = false;
+    Alert InfoAlert;
+
     GA gA = new();
     int typeGA;
     string valueGA;
@@ -83,9 +120,6 @@ else
     List<GA> gaSBC = new();
     Regex _regex =
         new(@"^([0-9]|[1-9][0-9]|[1-2][0-5][0-5]){1}\/([0-9]|[1-9][0-9]|[1-2][0-5][0-5]{1})\/([0-9]|[1-9][0-9]|[1-2][0-5][0-5]){1}$");
-
-    // private vars
-
 
     void OpenDialog()
     {
@@ -97,9 +131,33 @@ else
         dialogIsOpen = true;
     }
 
-    void EditGA(string ga)
+    void EditGA(string gAddr)
     {
-        
+        var gaEdit = gaSBC.FirstOrDefault(ga => ga.GAddress == gAddr);
+        valueGA = gaEdit.GAddress;
+        descriptionGA = gaEdit.Description;
+        typeGA = Convert.ToInt32(gaEdit.GType);
+        editIsOpen = true;
+    }
+
+    void CancelEditClick()
+    {
+        valueGA = string.Empty;
+        descriptionGA = string.Empty;
+        editIsOpen = false;
+    }
+
+    void EditClick()
+    {
+        if (valueGA is not null)
+        {
+            var gaToChange = gaSBC.FirstOrDefault(ga => ga.GAddress == valueGA);
+            gaToChange.GType = GA.IntToDpt(typeGA);
+            gaToChange.Description = descriptionGA;
+
+        }
+        editIsOpen = false;
+        StateHasChanged();
     }
 
     void OkClick()
@@ -133,6 +191,8 @@ else
     void SaveToFile()
     {
         fileService.WriteSbcToFile(gaSBC);
+        Thread timerThread = new Thread(new ThreadStart(() => TimerCount(5000)));
+        timerThread.Start();
     }
 
     void GetGaAtStartUp()
@@ -144,7 +204,7 @@ else
     {
         var s = gaAddress; // add code
         var item = gaSBC.FirstOrDefault(ga => ga.GAddress == gaAddress);
-        if(item is not null)
+        if (item is not null)
         {
             gaSBC.Remove(item);
         }
@@ -155,6 +215,13 @@ else
     protected override void OnInitialized()
     {
         GetGaAtStartUp();
+    }
+
+    void TimerCount(int period)
+    {
+        InfoAlert.Show();
+        Thread.Sleep(period);
+        InfoAlert.Hide();
     }
 
 }
