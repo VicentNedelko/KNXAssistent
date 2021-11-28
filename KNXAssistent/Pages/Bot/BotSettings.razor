@@ -1,6 +1,6 @@
 ﻿@page "/Bot/BotSettings";
 @using DAL.Models
-@using KNXAssistent.Data
+@using KNXManager.FileService
 @using System.Text.RegularExpressions
 @using System.Threading
 @inject IFileService fileService
@@ -38,11 +38,11 @@
             {
                 <Blazorise.TableRow>
                     <TableRowHeader>@(gaSBC.IndexOf(ga) + 1)</TableRowHeader>
-                    <TableRowCell>@ga.GAddress</TableRowCell>
+                    <TableRowCell>@ga.Address</TableRowCell>
                     <TableRowCell>@ga.GType</TableRowCell>
                     <TableRowCell>@ga.Description</TableRowCell>
-                    <TableRowCell><MatButton Dense="true" OnClick="() => RemoveGA(ga.GAddress)">Remove</MatButton></TableRowCell>
-                    <TableRowCell><MatButton Dense=true OnClick="() => EditGA(ga.GAddress)">Edit</MatButton></TableRowCell>
+                    <TableRowCell><MatButton Dense="true" OnClick="() => RemoveGA(ga.Address)">Remove</MatButton></TableRowCell>
+                    <TableRowCell><MatButton Dense=true OnClick="() => EditGA(ga.Address)">Edit</MatButton></TableRowCell>
                 </Blazorise.TableRow>
             }
         </TableBody>
@@ -125,7 +125,7 @@ else
     {
         error = null;
         valueGA = null;
-        gA.GAddress = null;
+        gA.Address = null;
         gA.Description = null;
         typeGA = 0;
         dialogIsOpen = true;
@@ -133,8 +133,8 @@ else
 
     void EditGA(string gAddr)
     {
-        var gaEdit = gaSBC.FirstOrDefault(ga => ga.GAddress == gAddr);
-        valueGA = gaEdit.GAddress;
+        var gaEdit = gaSBC.FirstOrDefault(ga => ga.Address == gAddr);
+        valueGA = gaEdit.Address;
         descriptionGA = gaEdit.Description;
         typeGA = Convert.ToInt32(gaEdit.GType);
         editIsOpen = true;

@@ -1,4 +1,6 @@
 ﻿using DAL.Enums;
+using Knx.Bus.Common;
+using Knx.Falcon;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,13 +12,14 @@ namespace DAL.Models
     public class GA
     {
         public string GAddress { get; set; }
+        public GroupAddress Address { get; set; }
         public DptType? GType { get; set; }
         public string Description { get; set; }
 
 
         public override string ToString()
         {
-            string result = string.Concat(GAddress, " > ", GType);
+            string result = string.Concat(Address, " > ", GType);
             return result;
         }
 

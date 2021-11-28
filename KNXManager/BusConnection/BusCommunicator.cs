@@ -3,12 +3,14 @@ using Knx.Bus.Common;
 using Knx.Bus.Common.Configuration;
 using Knx.Bus.Common.KnxIp;
 using Knx.Falcon.Sdk;
+using KNXManager.FileService;
 using System.Linq;
 
 namespace KNXManager.BusConnection
 {
     public class BusCommunicator : IBusCommunicator
     {
+        private readonly IFileService _fileService;
         public DiscoveryResult[] Interfaces { get; set; }
         public KnxInterface ActiveInt { get; set; } = new();
         public Bus bus { get; set; }
@@ -44,6 +46,18 @@ namespace KNXManager.BusConnection
             ActiveInt.Name = (Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp)).FriendlyName;
             ActiveInt.Mac = Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp).MacAddress.ToString();
             ActiveInt.IndividualAddress = Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp).IndividualAddress.ToString();
+        }
+
+        public void StartMonitor()
+        {
+            bus.GroupValueReceived += Bus_GroupValueReceived;
+        }
+
+        private void Bus_GroupValueReceived(GroupValueEventArgs obj)
+        {
+            var gaList = _fileService.ReadSbcFromFile();
+            if(gaList.Any(ga => ga.Address == obj.Address))
+
         }
     }
 }

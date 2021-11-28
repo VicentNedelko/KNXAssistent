@@ -4,17 +4,14 @@ using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 
-namespace KNXAssistent.Data
+namespace KNXManager.FileService
 {
-    
     public class FileService : IFileService
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
-        List<GA> gaList = new();
+        readonly List<GA> gaList = new();
 
         public FileService(IWebHostEnvironment webHostEnvironment)
         {

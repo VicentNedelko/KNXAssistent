@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 
-namespace KNXAssistent.Data
+namespace KNXManager.FileService
 {
     public interface IFileService
     {
