@@ -56,7 +56,7 @@ namespace KNXManager.BusConnection
         private void Bus_GroupValueReceived(GroupValueEventArgs obj)
         {
             var gaList = _fileService.ReadSbcFromFile();
-            if(gaList.Any(ga => ga.Address == obj.Address))
+            //if(gaList.Any(ga => ga.Address == obj.Address))
 
         }
     }

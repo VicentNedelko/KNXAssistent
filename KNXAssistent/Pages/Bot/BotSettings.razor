@@ -151,7 +151,7 @@ else
     {
         if (valueGA is not null)
         {
-            var gaToChange = gaSBC.FirstOrDefault(ga => ga.GAddress == valueGA);
+            var gaToChange = gaSBC.FirstOrDefault(ga => ga.Address == valueGA);
             gaToChange.GType = GA.IntToDpt(typeGA);
             gaToChange.Description = descriptionGA;
 
@@ -168,7 +168,7 @@ else
             {
                 gaSBC.Add(new GA
                 {
-                    GAddress = valueGA,
+                    Address = valueGA,
                     GType = GA.IntToDpt(typeGA),
                     Description = descriptionGA,
                 });
@@ -203,7 +203,7 @@ else
     void RemoveGA(string gaAddress)
     {
         var s = gaAddress; // add code
-        var item = gaSBC.FirstOrDefault(ga => ga.GAddress == gaAddress);
+        var item = gaSBC.FirstOrDefault(ga => ga.Address == gaAddress);
         if (item is not null)
         {
             gaSBC.Remove(item);
