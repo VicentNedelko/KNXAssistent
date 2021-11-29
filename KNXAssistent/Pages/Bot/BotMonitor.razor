@@ -1,4 +1,7 @@
 ﻿@page "/Bot/botMonitor";
+@using KNXManager.FileService
+
+@inject IFileService fileService
 
 <h4>Bot Monitor Logger</h4>
 
@@ -8,6 +11,19 @@
             </ItemTemplate>
         </MatVirtualScroll>
 
+        <MatButton Raised="true" OnClick="@OnStartClick">Start</MatButton>
+        <MatButton Outlined="true" OnClick="@OnStopClick">Stop</MatButton>
+
 @code {
+
+    void OnStartClick()
+    {
+        
+    }
+
+    void OnStopClick()
+    {
+        
+    }
 
 }
