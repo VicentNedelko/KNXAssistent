@@ -1,29 +1,50 @@
 ﻿@page "/Bot/botMonitor";
-@using KNXManager.FileService
+@using DAL.Models
+@using KNXManager.BusConnection
 
-@inject IFileService fileService
+@inject IBusCommunicator busCommunicator
 
 <h4>Bot Monitor Logger</h4>
 
-        <MatVirtualScroll style="height: 500px;" ItemType="string" Items="@items" ItemHeight="50">
-            <ItemTemplate>
-                <div>@context</div>
-            </ItemTemplate>
-        </MatVirtualScroll>
+<MatVirtualScroll style="height: 500px;" ItemType="string" Items="@items" ItemHeight="50">
+    <ItemTemplate>
+        <div>@context</div>
+    </ItemTemplate>
+</MatVirtualScroll>
 
-        <MatButton Raised="true" OnClick="@OnStartClick">Start</MatButton>
-        <MatButton Outlined="true" OnClick="@OnStopClick">Stop</MatButton>
+<MatButton Raised="true" OnClick="@OnStartClick">Start</MatButton>
+<MatButton Outlined="true" OnClick="@OnStopClick">Stop</MatButton>
 
 @code {
+    [Parameter]
+    public List<GaValue> gaValues { get; set; }
+
+    public List<string> items;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        gaValues = busCommunicator.gaValues;
+        items = new();
+    }
+
+    protected override void OnParametersSet()
+    {
+        foreach (var gaV in gaValues)
+        {
+            items.Add(string.Concat(gaV.Address.ToString(), " ", gaV.Type, " ", gaV.Value, " ", gaV.Unit, " ", gaV.Description));
+        }
+    }
+
 
     void OnStartClick()
     {
-        
+        busCommunicator.StartMonitor();
     }
 
     void OnStopClick()
     {
-        
+        busCommunicator.StopMonitor();
     }
 
 }

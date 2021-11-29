@@ -1,10 +1,13 @@
 ﻿using DAL.Models;
+using DAL.Enums;
 using Knx.Bus.Common;
 using Knx.Bus.Common.Configuration;
 using Knx.Bus.Common.KnxIp;
 using Knx.Falcon.Sdk;
 using KNXManager.FileService;
+using System.Collections.Generic;
 using System.Linq;
+using Knx.Bus.Common.DatapointTypes;
 
 namespace KNXManager.BusConnection
 {
@@ -14,10 +17,14 @@ namespace KNXManager.BusConnection
         public DiscoveryResult[] Interfaces { get; set; }
         public KnxInterface ActiveInt { get; set; } = new();
         public Bus bus { get; set; }
-        public BusCommunicator()
+        public List<GaValue> gaValues { get; set; }
+        public List<GA> gaSbcList { get; set; }
+        public BusCommunicator(IFileService fileService)
         {
             DiscoveryClient discoveryClient = new(AdapterTypes.All);
             Interfaces = discoveryClient.Discover();
+            _fileService = fileService;
+            gaValues = new();
         }
         public bool CheckConnection(string interfaceIp)
         {
@@ -50,14 +57,45 @@ namespace KNXManager.BusConnection
 
         public void StartMonitor()
         {
-            bus.GroupValueReceived += Bus_GroupValueReceived;
+            gaSbcList = _fileService.ReadSbcFromFile();
+            bus.GroupValueReceived += Bus_GroupValueSbcReceived;
         }
 
-        private void Bus_GroupValueReceived(GroupValueEventArgs obj)
+        public void StopMonitor()
         {
-            var gaList = _fileService.ReadSbcFromFile();
-            //if(gaList.Any(ga => ga.Address == obj.Address))
+            bus.GroupValueReceived -= Bus_GroupValueSbcReceived;
+            _fileService.WriteSbcValueToFile(gaValues);
+        }
 
+        private void Bus_GroupValueSbcReceived(GroupValueEventArgs obj)
+        {
+            if(gaSbcList.Any(ga => ga.Address == obj.Address))
+            {
+                var checkedGA = gaSbcList.First(ga => ga.Address == obj.Address);
+                var addingGA = new GaValue
+                {
+                    Address = checkedGA.Address,
+                    Type = checkedGA.GType,
+                    Description = checkedGA.Description,
+                };
+                addingGA.Value = addingGA.Type switch
+                {
+                    DptType.Switch => new Dpt1().ToTypedValue(obj.Value).ToString(),
+                    DptType.Percent => new Dpt5().ToTypedValue(obj.Value).ToString(),
+                    DptType.Temperature => new Dpt9().ToTypedValue(obj.Value).ToString(),
+                    DptType.Brightness => new Dpt9().ToTypedValue(obj.Value).ToString(),
+                    _ => obj.Value.ToString(),
+                };
+                addingGA.Unit = addingGA.Type switch
+                {
+                    DptType.Switch => string.Empty,
+                    DptType.Percent => "%",
+                    DptType.Temperature => "°C",
+                    DptType.Brightness => "Lux",
+                    _ => string.Empty,
+                };
+                gaValues.Add(addingGA);
+            }
         }
     }
 }

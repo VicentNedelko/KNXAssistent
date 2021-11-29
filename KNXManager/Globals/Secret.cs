@@ -12,6 +12,7 @@ namespace KNXManager.Globals
         public static string GASbcMonitor { get; set; } = "monitoring.txt";
         public static string GAWithThMonitor { get; set; } = "notification.txt";
         public static string GASbcList { get; set; } = "gaSbcList.json";
+        public static string GASbcValue { get; set; } = "gaValues.json";
         public static string GAThList { get; set; } = "gaThList.json";
         public static string HeosIps { get; set; } = "heosIps.json";
         public static long GIRAChatId { get; } = 481679093;
