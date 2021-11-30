@@ -5,13 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace DAL.Models
 {
     public class GA
     {
-        public string GAddress { get; set; }
+        [JsonConverter(typeof(AddressConverter))]
         public GroupAddress Address { get; set; }
         public DptType? GType { get; set; }
         public string Description { get; set; }
@@ -19,7 +20,7 @@ namespace DAL.Models
 
         public override string ToString()
         {
-            string result = string.Concat(Address, " > ", GType);
+            string result = string.Concat(Address.Address.ToString("G3"), " > ", GType);
             return result;
         }
 

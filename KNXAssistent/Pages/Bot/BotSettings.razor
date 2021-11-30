@@ -38,7 +38,7 @@
             {
                 <Blazorise.TableRow>
                     <TableRowHeader>@(gaSBC.IndexOf(ga) + 1)</TableRowHeader>
-                    <TableRowCell>@ga.Address</TableRowCell>
+                    <TableRowCell>@ga.Address.Address.ToString("G3")</TableRowCell>
                     <TableRowCell>@ga.GType</TableRowCell>
                     <TableRowCell>@ga.Description</TableRowCell>
                     <TableRowCell><MatButton Dense="true" OnClick="() => RemoveGA(ga.Address)">Remove</MatButton></TableRowCell>

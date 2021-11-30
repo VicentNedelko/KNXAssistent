@@ -37,7 +37,7 @@ namespace KNXAssistent
             services.AddSingleton<IBusCommunicator, BusCommunicator>();
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<IBot, Bot>();
-            services.AddScoped<IFileService, FileService>();
+            services.AddSingleton<IFileService, FileService>();
 
             services
               .AddBlazorise(options =>
