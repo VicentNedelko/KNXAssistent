@@ -58,15 +58,38 @@ namespace KNXManager.BusConnection
         public void StartMonitor()
         {
             gaSbcList = _fileService.ReadSbcFromFile();
-            bus.GroupValueReceived += Bus_GroupValueSbcReceived;
+            if(bus.State != BusConnectionStatus.Connected)
+            {
+                bus.Connect();
+            }
+            bus.GroupValueReceived += Bus_GroupValueReceived;
         }
 
         public void StopMonitor()
         {
-            bus.GroupValueReceived -= Bus_GroupValueSbcReceived;
+            bus.GroupValueReceived -= Bus_GroupValueReceived;
+            if(bus.State == BusConnectionStatus.Connected)
+            {
+                bus.Disconnect();
+            }
             _fileService.WriteSbcValueToFile(gaValues);
         }
 
+        // for test perposes
+        private void Bus_GroupValueReceived(GroupValueEventArgs obj)
+        {
+            var addingGA = new GaValue
+            {
+                Address = obj.Address,
+                Type = DptType.RawValue,
+                Description = "Description unavailable",
+                Value = obj.Value.ToString(),
+                Unit = "Raw format"
+            };
+            gaValues.Add(addingGA);
+        }
+
+        // actual method (NOT test)
         private void Bus_GroupValueSbcReceived(GroupValueEventArgs obj)
         {
             if(gaSbcList.Any(ga => ga.Address == obj.Address))
@@ -74,7 +97,7 @@ namespace KNXManager.BusConnection
                 var checkedGA = gaSbcList.First(ga => ga.Address == obj.Address);
                 var addingGA = new GaValue
                 {
-                    Address = checkedGA.Address,
+                    Address = GroupAddress.Parse(checkedGA.GAddress),
                     Type = checkedGA.GType,
                     Description = checkedGA.Description,
                 };

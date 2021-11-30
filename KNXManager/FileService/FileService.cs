@@ -1,4 +1,5 @@
 ﻿using DAL.Models;
+using Knx.Bus.Common;
 using KNXManager.Globals;
 using Microsoft.AspNetCore.Hosting;
 using System;
@@ -28,8 +29,19 @@ namespace KNXManager.FileService
             try
             {
                 result = JsonSerializer.Deserialize<List<GA>>(jsonData);
+                if (result.Count != 0)
+                {
+                    foreach (var ga in result)
+                    {
+                        if (GroupAddress.TryParse(ga.GAddress, out GroupAddress groupAddress))
+                        {
+                            ga.Address = groupAddress;
+                        }
+                    }
+                }
+
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return new List<GA>();
             }
@@ -67,7 +79,7 @@ namespace KNXManager.FileService
         {
             var path = Path.Combine(_webHostEnvironment.WebRootPath, "files", Secret.GASbcValue);
             var json = JsonSerializer.Serialize(gaValues);
-            using StreamWriter sw = new (path, false);
+            using StreamWriter sw = new(path, false);
             sw.Write(json);
             sw.Close();
         }

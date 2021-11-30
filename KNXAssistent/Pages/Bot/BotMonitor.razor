@@ -5,17 +5,29 @@
 @inject IBusCommunicator busCommunicator
 
 <h4>Bot Monitor Logger</h4>
+@if (busCommunicator.bus is not null)
+{
+    <MatVirtualScroll style="height: 500px;" ItemType="string" Items="@items" ItemHeight="50">
+        <ItemTemplate>
+            <div>@context</div>
+        </ItemTemplate>
+    </MatVirtualScroll>
+    <MatButton Raised="true" OnClick="@OnStartClick" Disabled="startBtnDsbl">Start</MatButton>
+    <MatButton Outlined="true" OnClick="@OnStopClick" Disabled="stopBtnDsbl">Stop</MatButton>
+}
+else
+{
+    <Alert Color="Color.Warning" Visible>
+        <AlertMessage>Warning!</AlertMessage>
+        <AlertDescription>To establish KNX connection select active interface.</AlertDescription>
+    </Alert>
+}
 
-<MatVirtualScroll style="height: 500px;" ItemType="string" Items="@items" ItemHeight="50">
-    <ItemTemplate>
-        <div>@context</div>
-    </ItemTemplate>
-</MatVirtualScroll>
-
-<MatButton Raised="true" OnClick="@OnStartClick">Start</MatButton>
-<MatButton Outlined="true" OnClick="@OnStopClick">Stop</MatButton>
 
 @code {
+    bool startBtnDsbl = false;
+    bool stopBtnDsbl = false;
+
     [Parameter]
     public List<GaValue> gaValues { get; set; }
 
@@ -26,13 +38,14 @@
         base.OnInitialized();
         gaValues = busCommunicator.gaValues;
         items = new();
+        stopBtnDsbl = true;
     }
 
     protected override void OnParametersSet()
     {
         foreach (var gaV in gaValues)
         {
-            items.Add(string.Concat(gaV.Address.ToString(), " ", gaV.Type, " ", gaV.Value, " ", gaV.Unit, " ", gaV.Description));
+            items.Add(string.Concat(gaV.Address.Address.ToString("G3"), " ", gaV.Type, " ", gaV.Value, " ", gaV.Unit, " ", gaV.Description));
         }
     }
 
@@ -40,11 +53,15 @@
     void OnStartClick()
     {
         busCommunicator.StartMonitor();
+        startBtnDsbl = true;
+        stopBtnDsbl = false;
     }
 
     void OnStopClick()
     {
         busCommunicator.StopMonitor();
+        startBtnDsbl = false;
+        stopBtnDsbl = true;
     }
 
 }

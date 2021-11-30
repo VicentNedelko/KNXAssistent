@@ -38,11 +38,11 @@
             {
                 <Blazorise.TableRow>
                     <TableRowHeader>@(gaSBC.IndexOf(ga) + 1)</TableRowHeader>
-                    <TableRowCell>@ga.Address.Address.ToString("G3")</TableRowCell>
+                    <TableRowCell>@ga.GAddress.ToString()</TableRowCell>
                     <TableRowCell>@ga.GType</TableRowCell>
                     <TableRowCell>@ga.Description</TableRowCell>
-                    <TableRowCell><MatButton Dense="true" OnClick="() => RemoveGA(ga.Address)">Remove</MatButton></TableRowCell>
-                    <TableRowCell><MatButton Dense=true OnClick="() => EditGA(ga.Address)">Edit</MatButton></TableRowCell>
+                    <TableRowCell><MatButton Dense="true" OnClick="() => RemoveGA(ga.GAddress)">Remove</MatButton></TableRowCell>
+                    <TableRowCell><MatButton Dense=true OnClick="() => EditGA(ga.GAddress)">Edit</MatButton></TableRowCell>
                 </Blazorise.TableRow>
             }
         </TableBody>
@@ -54,11 +54,7 @@ else
 }
 
 
-<MatButton Raised="true" OnClick="@OpenDialog">New GA</MatButton>
-@if (gaSBC.Count != 0)
-{
-    <MatButton Outlined="true" OnClick="@SaveToFile">Save To File</MatButton>
-}
+<MatButton Raised="true" OnClick="@OpenDialog">Add GA</MatButton>
 
 <MatDialog @bind-IsOpen="@dialogIsOpen">
     <MatDialogTitle>Add new SBC GA</MatDialogTitle>
@@ -125,16 +121,17 @@ else
     {
         error = null;
         valueGA = null;
-        gA.Address = null;
+        gA.GAddress = null;
         gA.Description = null;
         typeGA = 0;
         dialogIsOpen = true;
     }
 
+
     void EditGA(string gAddr)
     {
-        var gaEdit = gaSBC.FirstOrDefault(ga => ga.Address == gAddr);
-        valueGA = gaEdit.Address;
+        var gaEdit = gaSBC.FirstOrDefault(ga => ga.GAddress == gAddr);
+        valueGA = gaEdit.GAddress;
         descriptionGA = gaEdit.Description;
         typeGA = Convert.ToInt32(gaEdit.GType);
         editIsOpen = true;
@@ -168,10 +165,13 @@ else
             {
                 gaSBC.Add(new GA
                 {
-                    Address = valueGA,
+                    GAddress = valueGA,
                     GType = GA.IntToDpt(typeGA),
                     Description = descriptionGA,
                 });
+                fileService.WriteSbcToFile(gaSBC);
+                Thread timerThread = new Thread(new ThreadStart(() => TimerCount(2000)));
+                timerThread.Start();
             }
             else
             {
@@ -188,13 +188,6 @@ else
         dialogIsOpen = false;
     }
 
-    void SaveToFile()
-    {
-        fileService.WriteSbcToFile(gaSBC);
-        Thread timerThread = new Thread(new ThreadStart(() => TimerCount(5000)));
-        timerThread.Start();
-    }
-
     void GetGaAtStartUp()
     {
         gaSBC = fileService.ReadSbcFromFile();
@@ -203,7 +196,7 @@ else
     void RemoveGA(string gaAddress)
     {
         var s = gaAddress; // add code
-        var item = gaSBC.FirstOrDefault(ga => ga.Address == gaAddress);
+        var item = gaSBC.FirstOrDefault(ga => ga.GAddress == gaAddress);
         if (item is not null)
         {
             gaSBC.Remove(item);

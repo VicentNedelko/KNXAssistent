@@ -12,15 +12,16 @@ namespace DAL.Models
 {
     public class GA
     {
-        [JsonConverter(typeof(AddressConverter))]
-        public GroupAddress Address { get; set; }
+        public string GAddress { get; set; }
+        [JsonIgnore]
+        public GroupAddress? Address { get; set; }
         public DptType? GType { get; set; }
         public string Description { get; set; }
 
 
         public override string ToString()
         {
-            string result = string.Concat(Address.Address.ToString("G3"), " > ", GType);
+            string result = string.Concat(GAddress.ToString(), " > ", GType);
             return result;
         }
 
