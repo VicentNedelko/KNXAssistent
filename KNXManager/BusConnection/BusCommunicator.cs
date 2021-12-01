@@ -8,6 +8,7 @@ using KNXManager.FileService;
 using System.Collections.Generic;
 using System.Linq;
 using Knx.Bus.Common.DatapointTypes;
+using System;
 
 namespace KNXManager.BusConnection
 {
@@ -48,7 +49,14 @@ namespace KNXManager.BusConnection
                 bus.Disconnect();
             }
             bus = new Bus(new KnxIpTunnelingConnectorParameters(interfaceIp, 0x057, false));
-
+            try
+            {
+                bus.Connect();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
             ActiveInt.Ip = interfaceIp;
             ActiveInt.Name = (Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp)).FriendlyName;
             ActiveInt.Mac = Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp).MacAddress.ToString();
@@ -58,7 +66,7 @@ namespace KNXManager.BusConnection
         public void StartMonitor()
         {
             gaSbcList = _fileService.ReadSbcFromFile();
-            if(bus.State != BusConnectionStatus.Connected)
+            if(!bus.IsConnected)
             {
                 bus.Connect();
             }
@@ -68,7 +76,7 @@ namespace KNXManager.BusConnection
         public void StopMonitor()
         {
             bus.GroupValueReceived -= Bus_GroupValueReceived;
-            if(bus.State == BusConnectionStatus.Connected)
+            if(!bus.IsConnected)
             {
                 bus.Disconnect();
             }
