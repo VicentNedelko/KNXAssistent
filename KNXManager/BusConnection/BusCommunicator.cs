@@ -53,7 +53,7 @@ namespace KNXManager.BusConnection
             {
                 bus.Connect();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
@@ -66,17 +66,27 @@ namespace KNXManager.BusConnection
         public void StartMonitor()
         {
             gaSbcList = _fileService.ReadSbcFromFile();
-            if(!bus.IsConnected)
+            if (bus is not null)
             {
-                bus.Connect();
+                if(bus.State == BusConnectionStatus.Connected)
+                using (bus)
+                    bus.GroupValueReceived += Bus_GroupValueSbcReceived;
             }
-            bus.GroupValueReceived += Bus_GroupValueReceived;
+            else
+            {
+                using (bus = new(new KnxIpTunnelingConnectorParameters(ActiveInt.Ip, 0x0e57, false)))
+                {
+                    bus.Connect();
+                    bus.GroupValueReceived += Bus_GroupValueSbcReceived;
+                }
+            }
+
         }
 
         public void StopMonitor()
         {
             bus.GroupValueReceived -= Bus_GroupValueReceived;
-            if(!bus.IsConnected)
+            if (bus.State == BusConnectionStatus.Connected)
             {
                 bus.Disconnect();
             }
@@ -100,7 +110,7 @@ namespace KNXManager.BusConnection
         // actual method (NOT test)
         private void Bus_GroupValueSbcReceived(GroupValueEventArgs obj)
         {
-            if(gaSbcList.Any(ga => ga.Address == obj.Address))
+            if (gaSbcList.Any(ga => ga.Address == obj.Address))
             {
                 var checkedGA = gaSbcList.First(ga => ga.Address == obj.Address);
                 var addingGA = new GaValue
