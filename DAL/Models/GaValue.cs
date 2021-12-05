@@ -15,5 +15,9 @@ namespace DAL.Models
         public string Description { get; set; }
         public string Value { get; set; }
         public string Unit { get; set; }
+        public double? UpperTh { get; set; }
+        public double? LowerTh { get; set; }
+        public bool? Notification  { get; set; }
+        public bool IsThreshold { get; set; }
     }
 }

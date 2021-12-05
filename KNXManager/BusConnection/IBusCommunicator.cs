@@ -11,7 +11,8 @@ namespace KNXManager.BusConnection
         public KnxInterface ActiveInt { get; set; }
         public Bus bus { get; set; }
         public List<GaValue> gaValues { get; set; }
-        public bool CheckConnection(string interfaceIp);
+        public string ConnectionState { get; set; }
+        public string CheckConnection(string interfaceIp);
         public void SetInterface(string interfaceIp);
 
         public void StartMonitor();

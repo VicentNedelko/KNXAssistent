@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KNXManager.MessageService;
 
 namespace KNXAssistent
 {
@@ -34,10 +35,11 @@ namespace KNXAssistent
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddMatBlazor();
-            services.AddSingleton<IBusCommunicator, BusCommunicator>();
+            services.AddScoped<IBusCommunicator, BusCommunicator>();
             services.AddSingleton<WeatherForecastService>();
-            services.AddSingleton<IBot, Bot>();
-            services.AddSingleton<IFileService, FileService>();
+            services.AddScoped<IBot, Bot>();
+            services.AddScoped<IFileService, FileService>();
+            services.AddScoped<IMessService, MessService>();
 
             services
               .AddBlazorise(options =>

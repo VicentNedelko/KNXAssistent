@@ -26,7 +26,7 @@
                             {
                                 Ip = item.IpAddress.ToString(),
                                 Name = item.FriendlyName,
-                                Connected = busCommunicator.CheckConnection(item.IpAddress.ToString()),
+                                State = busCommunicator.CheckConnection(item.IpAddress.ToString()),
                                 Mac = item.MacAddress.ToString(),
                                 IndividualAddress = item.IndividualAddress,
                             }

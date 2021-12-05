@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Knx.Falcon.Sdk" Version="5.7.565" />
+    <PackageReference Include="System.IO" Version="4.3.0" />
     <PackageReference Include="Telegram.Bot" Version="16.0.2" />
     <PackageReference Include="Telegram.Bot.Extensions.Polling" Version="0.2.0" />
 	<FrameworkReference Include="Microsoft.AspNetCore.App" />

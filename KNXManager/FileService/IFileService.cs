@@ -9,6 +9,7 @@ namespace KNXManager.FileService
         public void WriteSbcToFile(List<GA> gAs);
         public void WriteSbcValueToFile(List<GaValue> gaValues);
         public void WriteThToFile(List<GAWithTh> gAWithThs);
+        public void ClearSbcValueFile();
         public List<GAWithTh> ReadThFromFile();
         public List<GA> ReadSbcFromFile();
     }

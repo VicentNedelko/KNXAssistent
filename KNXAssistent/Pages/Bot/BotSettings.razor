@@ -1,11 +1,13 @@
 ﻿@page "/Bot/BotSettings";
 @using DAL.Models
 @using KNXManager.FileService
+@using KNXManager.MessageService
 @using System.Text.RegularExpressions
 @using System.Threading
 @inject IFileService fileService
+@inject IMessService messService
 
-<h3>GA List for Telegram Bot notifications</h3>
+<h3>GA List for Telegram notifications</h3>
 <br />
 <p>@error</p>
 
@@ -31,6 +33,7 @@
                 <TableHeaderCell>Description</TableHeaderCell>
                 <TableHeaderCell>Remove</TableHeaderCell>
                 <TableHeaderCell>Edit</TableHeaderCell>
+                <TableHeaderCell>Send Notification ?</TableHeaderCell>
             </Blazorise.TableRow>
         </TableHeader>
         <TableBody>
@@ -43,6 +46,7 @@
                     <TableRowCell>@ga.Description</TableRowCell>
                     <TableRowCell><MatButton Dense="true" OnClick="() => RemoveGA(ga.GAddress)">Remove</MatButton></TableRowCell>
                     <TableRowCell><MatButton Dense=true OnClick="() => EditGA(ga.GAddress)">Edit</MatButton></TableRowCell>
+                    <TableRowCell><MatCheckbox @bind-Value="@ga.Notification"></MatCheckbox></TableRowCell>
                 </Blazorise.TableRow>
             }
         </TableBody>
@@ -57,7 +61,7 @@ else
 <MatButton Raised="true" OnClick="@OpenDialog">Add GA</MatButton>
 
 <MatDialog @bind-IsOpen="@dialogIsOpen">
-    <MatDialogTitle>Add new SBC GA</MatDialogTitle>
+    <MatDialogTitle>Add new GA</MatDialogTitle>
     <MatDialogContent>
         <p>Enter new GA parameters</p>
         <MatTextField @bind-Value="@valueGA" Label="Address _/_/_"></MatTextField>
@@ -70,6 +74,7 @@ else
             <MatOption Value="1">raw</MatOption>
         </MatSelect>
         <MatTextField @bind-Value="@descriptionGA" Label="Description"></MatTextField>
+        <MatCheckbox @bind-Value="@notificationGA" Label="Notification"></MatCheckbox>
     </MatDialogContent>
     <MatDialogActions>
         <MatButton OnClick="@OkClick">OK</MatButton>
@@ -101,6 +106,8 @@ else
 
 
 @code {
+    [Inject] INotificationService NotificationService { get; set; }
+
     // private vars
 
     bool dialogIsOpen = false;
@@ -112,6 +119,7 @@ else
     int typeGA;
     string valueGA;
     string descriptionGA;
+    bool notificationGA;
     string error;
     List<GA> gaSBC = new();
     Regex _regex =
@@ -168,14 +176,19 @@ else
                     GAddress = valueGA,
                     GType = GA.IntToDpt(typeGA),
                     Description = descriptionGA,
+                    IsThreshold = false,
+                    Notification = notificationGA,
                 });
                 fileService.WriteSbcToFile(gaSBC);
                 Thread timerThread = new Thread(new ThreadStart(() => TimerCount(2000)));
                 timerThread.Start();
+                messService.AddInfoMessage($"New GA {valueGA} added");
+                NotificationService.Info($"New GA {valueGA} added", "Information");
             }
             else
             {
                 error = "GA address type doesn't match the 3-level sample - __/__/__ ";
+                messService.AddWarningMessage($"GA address type doesn't match the 3-level sample - __/__/__  - {valueGA}");
             }
 
         }
@@ -201,7 +214,8 @@ else
         {
             gaSBC.Remove(item);
         }
-
+        fileService.WriteSbcToFile(gaSBC);
+        messService.AddWarningMessage($"Remove GA - {gaAddress}");
         StateHasChanged();
     }
 

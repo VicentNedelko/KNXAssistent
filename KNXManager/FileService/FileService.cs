@@ -77,10 +77,24 @@ namespace KNXManager.FileService
 
         public void WriteSbcValueToFile(List<GaValue> gaValues)
         {
-            var path = Path.Combine(_webHostEnvironment.WebRootPath, "files", Secret.GASbcValue);
+            var path = Path.Combine(_webHostEnvironment.WebRootPath, "files", "Data", DateTime.Now.ToShortDateString(), Secret.GASbcValue);
+            var dir = Path.Combine(_webHostEnvironment.WebRootPath, "files", "Data", DateTime.Now.ToShortDateString());
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
             var json = JsonSerializer.Serialize(gaValues);
-            using StreamWriter sw = new(path, false);
+            using StreamWriter sw = new(path, true);
             sw.Write(json);
+            sw.Close();
+            sw.Flush();
+        }
+
+        public void ClearSbcValueFile()
+        {
+            var path = Path.Combine(_webHostEnvironment.WebRootPath, "files", Secret.GASbcValue);
+            using StreamWriter sw = new(path, false);
+            sw.Write(string.Empty);
             sw.Close();
         }
 

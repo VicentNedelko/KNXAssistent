@@ -4,14 +4,64 @@
 
 @inject IBusCommunicator busCommunicator
 
-<h4>Bot Monitor Logger</h4>
-@if (busCommunicator.bus is not null)
+<h4>Monitor Logger</h4>
+<br />
+<MatDivider></MatDivider>
+<Div>
+    <p>Active Interface</p>
+    <p>
+        <MatStringField ReadOnly="true" Value="@busCommunicator.ActiveInt.Ip" Label="Interface IP"></MatStringField>
+    </p>
+    <p>
+        <MatStringField ReadOnly="true" Value="@busCommunicator.ActiveInt.Name" Label="Interface NAME"></MatStringField>
+    </p>
+    <p>
+        <MatStringField ReadOnly="true" Value="@ConnectionState" Label="Interface STATE"></MatStringField>
+    </p>
+</Div>
+<MatDivider></MatDivider>
+
+
+@if (!String.IsNullOrEmpty(busCommunicator.ActiveInt.Ip))
 {
-    <MatVirtualScroll style="height: 500px;" ItemType="string" Items="@items" ItemHeight="50">
-        <ItemTemplate>
-            <div>@context</div>
-        </ItemTemplate>
-    </MatVirtualScroll>
+    @if (busCommunicator.gaValues.Count() != 0)
+    {
+
+
+        <Table FixedHeader="true" FixedHeaderTableHeight="300px">
+            <TableHeader>
+                <Blazorise.TableRow>
+                    <TableHeaderCell>Num</TableHeaderCell>
+                    <TableHeaderCell>Description</TableHeaderCell>
+                    <TableHeaderCell>Address</TableHeaderCell>
+                    <TableHeaderCell>Value</TableHeaderCell>
+                    <TableHeaderCell>Unit</TableHeaderCell>
+                    <TableHeaderCell>Notification</TableHeaderCell>
+                </Blazorise.TableRow>
+            </TableHeader>
+            <TableBody>
+                @foreach (var v in busCommunicator.gaValues)
+                {
+                    <Blazorise.TableRow>
+                        <TableRowHeader>@(busCommunicator.gaValues.IndexOf(v) + 1)</TableRowHeader>
+                        <TableRowCell>@v.Description</TableRowCell>
+                        <TableRowCell>@v.Address</TableRowCell>
+                        <TableRowCell>@v.Value</TableRowCell>
+                        <TableRowCell>@v.Unit</TableRowCell>
+                        <TableRowCell>Notification</TableRowCell>
+                    </Blazorise.TableRow>
+                }
+            </TableBody>
+        </Table>
+    }
+    else
+    {
+        <Alert Color="Color.Info" Visible="true">
+            <AlertMessage>KNX Bus : </AlertMessage>
+            <AlertDescription>No Data loaded yet.</AlertDescription>
+        </Alert>
+    }
+
     <MatButton Raised="true" OnClick="@OnStartClick" Disabled="startBtnDsbl">Start</MatButton>
     <MatButton Outlined="true" OnClick="@OnStopClick" Disabled="stopBtnDsbl">Stop</MatButton>
 }
@@ -29,24 +79,13 @@ else
     bool stopBtnDsbl = false;
 
     [Parameter]
-    public List<GaValue> gaValues { get; set; }
-
-    public List<string> items;
+    public string ConnectionState { get; set; }
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        gaValues = busCommunicator.gaValues;
-        items = new();
         stopBtnDsbl = true;
-    }
-
-    protected override void OnParametersSet()
-    {
-        foreach (var gaV in gaValues)
-        {
-            items.Add(string.Concat(gaV.Address.Address.ToString("G3"), " ", gaV.Type, " ", gaV.Value, " ", gaV.Unit, " ", gaV.Description));
-        }
+        ConnectionState = busCommunicator.ConnectionState;
     }
 
 

@@ -8,55 +8,45 @@ using KNXManager.FileService;
 using System.Collections.Generic;
 using System.Linq;
 using Knx.Bus.Common.DatapointTypes;
-using System;
+using KNXManager.MessageService;
 
 namespace KNXManager.BusConnection
 {
     public class BusCommunicator : IBusCommunicator
     {
         private readonly IFileService _fileService;
+        private readonly IMessService _messService;
         public DiscoveryResult[] Interfaces { get; set; }
         public KnxInterface ActiveInt { get; set; } = new();
         public Bus bus { get; set; }
         public List<GaValue> gaValues { get; set; }
         public List<GA> gaSbcList { get; set; }
-        public BusCommunicator(IFileService fileService)
+
+        public string Information { get; set; }
+        public string ConnectionState { get; set; } = "Not Applied";
+        public BusCommunicator(IFileService fileService, IMessService messService)
         {
             DiscoveryClient discoveryClient = new(AdapterTypes.All);
             Interfaces = discoveryClient.Discover();
             _fileService = fileService;
             gaValues = new();
+            _messService = messService;
         }
-        public bool CheckConnection(string interfaceIp)
+
+        public string CheckConnection(string interfaceIp)
         {
             bus = new Bus(new KnxIpTunnelingConnectorParameters(interfaceIp, 0x0e57, false));
             using (bus)
             {
                 bus.Connect();
-                if (bus.CheckCommunication() == CheckCommunicationResult.Ok)
-                {
-                    return true;
-                }
+                string state = bus.CheckCommunication().ToString();
                 bus.Disconnect();
-                return false;
+                return state;
             }
         }
 
         public void SetInterface(string interfaceIp)
         {
-            if (bus is not null && bus.State == BusConnectionStatus.Connected)
-            {
-                bus.Disconnect();
-            }
-            bus = new Bus(new KnxIpTunnelingConnectorParameters(interfaceIp, 0x057, false));
-            try
-            {
-                bus.Connect();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
             ActiveInt.Ip = interfaceIp;
             ActiveInt.Name = (Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp)).FriendlyName;
             ActiveInt.Mac = Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp).MacAddress.ToString();
@@ -66,48 +56,31 @@ namespace KNXManager.BusConnection
         public void StartMonitor()
         {
             gaSbcList = _fileService.ReadSbcFromFile();
-            if (bus is not null)
-            {
-                if(bus.State == BusConnectionStatus.Connected)
-                using (bus)
-                    bus.GroupValueReceived += Bus_GroupValueSbcReceived;
-            }
-            else
-            {
-                using (bus = new(new KnxIpTunnelingConnectorParameters(ActiveInt.Ip, 0x0e57, false)))
-                {
-                    bus.Connect();
-                    bus.GroupValueReceived += Bus_GroupValueSbcReceived;
-                }
-            }
+            bus = new(new KnxIpTunnelingConnectorParameters(ActiveInt.Ip, 0x0e57, false));
+            bus.Connect();
+            bus.GroupValueReceived += Bus_GroupValueSbcReceived;
+            bus.StateChanged += Bus_StateChanged;
+            _messService.AddInfoMessage($"Start monitoring on {ActiveInt.Ip}-{ActiveInt.Name}");
+        }
 
+        private void Bus_StateChanged(BusConnectionStatus obj)
+        {
+            ConnectionState = obj.ToString();
+            bus.Dispose();
+            _fileService.WriteSbcValueToFile(gaValues);
+            _messService.AddWarningMessage($"Interface change state to - {obj}");
         }
 
         public void StopMonitor()
         {
-            bus.GroupValueReceived -= Bus_GroupValueReceived;
-            if (bus.State == BusConnectionStatus.Connected)
-            {
-                bus.Disconnect();
-            }
+            bus.GroupValueReceived -= Bus_GroupValueSbcReceived;
+            bus.StateChanged -= Bus_StateChanged;
+            bus.Disconnect();
+            bus.Dispose();
             _fileService.WriteSbcValueToFile(gaValues);
+            _messService.AddInfoMessage($"Stop monitoring on {ActiveInt.Ip}-{ActiveInt.Name}");
         }
 
-        // for test perposes
-        private void Bus_GroupValueReceived(GroupValueEventArgs obj)
-        {
-            var addingGA = new GaValue
-            {
-                Address = obj.Address,
-                Type = DptType.RawValue,
-                Description = "Description unavailable",
-                Value = obj.Value.ToString(),
-                Unit = "Raw format"
-            };
-            gaValues.Add(addingGA);
-        }
-
-        // actual method (NOT test)
         private void Bus_GroupValueSbcReceived(GroupValueEventArgs obj)
         {
             if (gaSbcList.Any(ga => ga.Address == obj.Address))

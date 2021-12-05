@@ -14,7 +14,7 @@
         </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="Bot/botInfo" @onclick="() => collapseBotMenu = !collapseBotMenu">
-                <MatIcon Icon="settings_cell"></MatIcon> Bot
+                <MatIcon Icon="settings_cell"></MatIcon> Monitoring
             </NavLink>
             @if (collapseBotMenu)
             {
@@ -49,9 +49,24 @@
             }
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <MatIcon Icon="settings_applications"></MatIcon> Archive Settings
+            <NavLink class="nav-link" href="Archive/Info" @onclick="() => collapseArchiveMenu = !collapseArchiveMenu">
+                <MatIcon Icon="settings_applications"></MatIcon> Archive
             </NavLink>
+            @if (collapseArchiveMenu)
+            {
+                <ul>
+                    <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="Archive/LoadFromFile">
+                            <MatIcon Icon="settings_remote"></MatIcon> Load from
+                        </NavLink>
+                    </li>
+                    <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="Archive/FileManager">
+                            <MatIcon Icon="settings_remote"></MatIcon> Manager
+                        </NavLink>
+                    </li>
+                </ul>
+            }
         </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="interfaces">
@@ -65,6 +80,7 @@
     private bool collapseNavMenu = false;
     private bool collapseBotMenu = false;
     private bool collapseNotifMenu = false;
+    private bool collapseArchiveMenu = false;
 
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 

@@ -1,7 +1,67 @@
-﻿@page "/"
+﻿@using KNXManager.MessageService
+@inject IMessService messService
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@page "/"
+
+<h1>Information desk</h1>
+@if (messService.Messages.Count() != 0)
+{
+    <Table FixedHeader="true" FixedHeaderTableHeight="500px">
+        <TableHeader>
+            <Blazorise.TableRow>
+                <TableHeaderCell>Num</TableHeaderCell>
+                <TableHeaderCell>Time Stamp</TableHeaderCell>
+                <TableHeaderCell>Information</TableHeaderCell>
+            </Blazorise.TableRow>
+        </TableHeader>
+        <TableBody>
+            @foreach (var mes in messService.Messages)
+            {
+                <Blazorise.TableRow>
+                    <TableRowHeader Class="@mes.StyleType">@(messService.Messages.IndexOf(mes) + 1)</TableRowHeader>
+                    <TableRowCell Class="@mes.StyleType">@mes.TimeStamp.ToShortTimeString()</TableRowCell>
+                    <TableRowCell Class="@mes.StyleType">@mes.Information</TableRowCell>
+                </Blazorise.TableRow>
+            }
+        </TableBody>
+    </Table>
+}
+else
+{
+    <div class="alert alert-info" role="alert">
+        No messages yet.
+    </div>
+}
+
+
+
+@code{
+
+    [Inject] INotificationService NotificationService { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return base.OnParametersSetAsync();
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        messService.Notify += OnNotify;
+
+    }
+    public void OnNotify()
+    {
+        NotificationService.Success("New message received", "Information");
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        messService.Notify -= OnNotify;
+    }
+
+
+}
