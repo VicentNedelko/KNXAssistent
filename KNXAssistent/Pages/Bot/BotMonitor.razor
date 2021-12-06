@@ -86,6 +86,7 @@ else
         base.OnInitialized();
         stopBtnDsbl = true;
         ConnectionState = busCommunicator.ConnectionState;
+        busCommunicator.OnGaReceived += OnNotify;
     }
 
 
@@ -101,6 +102,12 @@ else
         busCommunicator.StopMonitor();
         startBtnDsbl = false;
         stopBtnDsbl = true;
+        busCommunicator.OnGaReceived -= OnNotify;
+    }
+
+    public void OnNotify()
+    {
+        this.InvokeAsync(() => this.StateHasChanged());
     }
 
 }

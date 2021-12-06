@@ -86,8 +86,8 @@ namespace KNXManager.FileService
             var json = JsonSerializer.Serialize(gaValues);
             using StreamWriter sw = new(path, true);
             sw.Write(json);
-            sw.Close();
             sw.Flush();
+            sw.Close();
         }
 
         public void ClearSbcValueFile()

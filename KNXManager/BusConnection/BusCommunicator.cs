@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Knx.Bus.Common.DatapointTypes;
 using KNXManager.MessageService;
+using System;
 
 namespace KNXManager.BusConnection
 {
@@ -21,6 +22,7 @@ namespace KNXManager.BusConnection
         public Bus bus { get; set; }
         public List<GaValue> gaValues { get; set; }
         public List<GA> gaSbcList { get; set; }
+        public event Action OnGaReceived;
 
         public string Information { get; set; }
         public string ConnectionState { get; set; } = "Not Applied";
@@ -109,6 +111,7 @@ namespace KNXManager.BusConnection
                     _ => string.Empty,
                 };
                 gaValues.Add(addingGA);
+                OnGaReceived?.Invoke();
             }
         }
     }
