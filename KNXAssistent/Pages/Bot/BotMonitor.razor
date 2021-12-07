@@ -75,13 +75,15 @@ else
 
 
 @code {
+
+    [Inject] INotificationService NotificationService { get; set; }
     bool startBtnDsbl = false;
     bool stopBtnDsbl = false;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        if(busCommunicator.bus.State == Knx.Bus.Common.BusConnectionStatus.Connected)
+        if(busCommunicator.bus is not null)
         {
             startBtnDsbl = true;
             stopBtnDsbl = false;
@@ -113,6 +115,7 @@ else
     public void OnNotify()
     {
         this.InvokeAsync(() => this.StateHasChanged());
+        NotificationService.Info($"GA - {busCommunicator.gaValues.Last().Address} receive Value = {busCommunicator.gaValues.Last().Value}");
     }
 
 }

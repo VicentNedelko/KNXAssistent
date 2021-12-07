@@ -49,9 +49,5 @@ namespace KNXManager.MessageService
             Notify?.Invoke();
         }
 
-        void IMessService.AddDangerMessageAsync(string message)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

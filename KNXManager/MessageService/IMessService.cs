@@ -11,7 +11,7 @@ namespace KNXManager.MessageService
         public List<Mess> Messages { get; set; }
         public void AddInfoMessage(string message);
         public void AddWarningMessage(string message);
-        public void AddDangerMessageAsync(string message);
+        public void AddDangerMessage(string message);
         public event Action Notify;
     }
 }

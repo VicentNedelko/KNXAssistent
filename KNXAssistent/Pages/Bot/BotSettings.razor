@@ -7,7 +7,7 @@
 @inject IFileService fileService
 @inject IMessService messService
 
-<h3>GA List for Telegram notifications</h3>
+<h3>GA List SBC</h3>
 <br />
 <p>@error</p>
 
@@ -30,6 +30,8 @@
                 <TableHeaderCell>Num</TableHeaderCell>
                 <TableHeaderCell>Address</TableHeaderCell>
                 <TableHeaderCell>Type</TableHeaderCell>
+                <TableHeaderCell>Min THV</TableHeaderCell>
+                <TableHeaderCell>Max THV</TableHeaderCell>
                 <TableHeaderCell>Description</TableHeaderCell>
                 <TableHeaderCell>Remove</TableHeaderCell>
                 <TableHeaderCell>Edit</TableHeaderCell>
@@ -39,15 +41,21 @@
         <TableBody>
             @foreach (var ga in gaSBC)
             {
-                <Blazorise.TableRow>
-                    <TableRowHeader>@(gaSBC.IndexOf(ga) + 1)</TableRowHeader>
-                    <TableRowCell>@ga.GAddress.ToString()</TableRowCell>
-                    <TableRowCell>@ga.GType</TableRowCell>
-                    <TableRowCell>@ga.Description</TableRowCell>
-                    <TableRowCell><MatButton Dense="true" OnClick="() => RemoveGA(ga.GAddress)">Remove</MatButton></TableRowCell>
-                    <TableRowCell><MatButton Dense=true OnClick="() => EditGA(ga.GAddress)">Edit</MatButton></TableRowCell>
-                    <TableRowCell><MatCheckbox @bind-Value="@ga.Notification"></MatCheckbox></TableRowCell>
-                </Blazorise.TableRow>
+            <Blazorise.TableRow>
+                <TableRowHeader>@(gaSBC.IndexOf(ga) + 1)</TableRowHeader>
+                <TableRowCell>@ga.GAddress.ToString()</TableRowCell>
+                <TableRowCell>@ga.GType</TableRowCell>
+                @{ if (ga.LowerTh is null) { lower = "Not set"; } else { lower = ga.LowerTh.ToString(); }
+                }
+                <TableRowCell>@lower</TableRowCell>
+                @{ if (ga.UpperTh is null) { upper = "Not set"; } else { upper = ga.UpperTh.ToString(); }
+                }
+                <TableRowCell>@upper</TableRowCell>
+                <TableRowCell>@ga.Description</TableRowCell>
+                <TableRowCell><MatButton Dense="true" OnClick="() => RemoveGA(ga.GAddress)">Remove</MatButton></TableRowCell>
+                <TableRowCell><MatButton Dense=true OnClick="() => EditGA(ga.GAddress)">Edit</MatButton></TableRowCell>
+                <TableRowCell><MatCheckbox @bind-Value="@ga.Notification" Disabled="true"></MatCheckbox></TableRowCell>
+            </Blazorise.TableRow>
             }
         </TableBody>
     </Table>
@@ -74,6 +82,7 @@ else
             <MatOption Value="1">raw</MatOption>
         </MatSelect>
         <MatTextField @bind-Value="@descriptionGA" Label="Description"></MatTextField>
+        @*add fields to upper and lower thresholds*@
         <MatCheckbox @bind-Value="@notificationGA" Label="Notification"></MatCheckbox>
     </MatDialogContent>
     <MatDialogActions>
@@ -97,6 +106,7 @@ else
             <MatOption Value="1">raw</MatOption>
         </MatSelect>
         <MatTextField @bind-Value="@descriptionGA" Label="Description"></MatTextField>
+        <MatCheckbox @bind-Value="@notificationGA" Label="Notification"></MatCheckbox>
         <MatDialogActions>
             <MatButton OnClick="@EditClick">Edit</MatButton>
             <MatButton OnClick="@CancelEditClick">Cancel</MatButton>
@@ -113,6 +123,7 @@ else
     bool dialogIsOpen = false;
     bool editIsOpen = false;
     bool alertOpen = false;
+    string lower, upper;
     Alert InfoAlert;
 
     GA gA = new();
@@ -143,6 +154,7 @@ else
         descriptionGA = gaEdit.Description;
         typeGA = Convert.ToInt32(gaEdit.GType);
         editIsOpen = true;
+        notificationGA = gaEdit.Notification;
     }
 
     void CancelEditClick()
@@ -159,6 +171,8 @@ else
             var gaToChange = gaSBC.FirstOrDefault(ga => ga.Address == valueGA);
             gaToChange.GType = GA.IntToDpt(typeGA);
             gaToChange.Description = descriptionGA;
+            gaToChange.Notification = notificationGA;
+            fileService.WriteSbcToFile(gaSBC);
 
         }
         editIsOpen = false;

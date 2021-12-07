@@ -1,1 +1,1 @@
-[{"GAddress":"0/4/7","GType":9004,"Description":"showroom brightness","Unit":null,"UpperTh":null,"LowerTh":null,"Notification":false,"IsThreshold":false},{"GAddress":"2/2/0","GType":1001,"Description":null,"Unit":null,"UpperTh":null,"LowerTh":null,"Notification":false,"IsThreshold":false}]
+[{"GAddress":"0/4/7","GType":9004,"Description":"showroom brightness","Unit":null,"UpperTh":null,"LowerTh":null,"Notification":true,"IsThreshold":false},{"GAddress":"2/2/0","GType":1001,"Description":null,"Unit":null,"UpperTh":null,"LowerTh":null,"Notification":true,"IsThreshold":false}]

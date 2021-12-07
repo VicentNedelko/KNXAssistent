@@ -10,6 +10,7 @@ using System.Linq;
 using Knx.Bus.Common.DatapointTypes;
 using KNXManager.MessageService;
 using System;
+using KNXManager.BotManager;
 
 namespace KNXManager.BusConnection
 {
@@ -17,6 +18,7 @@ namespace KNXManager.BusConnection
     {
         private readonly IFileService _fileService;
         private readonly IMessService _messService;
+        private readonly IBot _bot;
         public DiscoveryResult[] Interfaces { get; set; }
         public KnxInterface ActiveInt { get; set; } = new();
         public Bus bus { get; set; }
@@ -26,13 +28,14 @@ namespace KNXManager.BusConnection
 
         public string Information { get; set; }
         public string ConnectionState { get; set; } = "Not Applied";
-        public BusCommunicator(IFileService fileService, IMessService messService)
+        public BusCommunicator(IFileService fileService, IMessService messService, IBot bot)
         {
             DiscoveryClient discoveryClient = new(AdapterTypes.All);
             Interfaces = discoveryClient.Discover();
             _fileService = fileService;
             gaValues = new();
             _messService = messService;
+            _bot = bot;
         }
 
         public string CheckConnection(string interfaceIp)
@@ -111,7 +114,9 @@ namespace KNXManager.BusConnection
                     DptType.Brightness => "Lux",
                     _ => string.Empty,
                 };
+                addingGA.Notification = checkedGA.Notification;
                 gaValues.Add(addingGA);
+                if (checkedGA.Notification) { _bot.SendMessageAsync($"Info! {addingGA.Description} = {addingGA.Value} {addingGA.Unit}"); }
                 OnGaReceived?.Invoke();
             }
         }

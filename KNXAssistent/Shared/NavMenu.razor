@@ -21,7 +21,12 @@
                 <ul>
                     <li class="nav-item px-3">
                         <NavLink class="nav-link" href="Bot/botSettings">
-                            <MatIcon Icon="info"></MatIcon> Settings
+                            <MatIcon Icon="info"></MatIcon> Settings SBC
+                        </NavLink>
+                    </li>
+                    <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="Bot/botSettingsTHV">
+                            <MatIcon Icon="compare_arrows"></MatIcon> Settings THV
                         </NavLink>
                     </li>
                     <li class="nav-item px-3">
@@ -31,21 +36,6 @@
                     </li>
                 </ul>
 
-            }
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="Notifications/info" @onclick="() => collapseNotifMenu = !collapseNotifMenu">
-                <MatIcon Icon="event"></MatIcon> Notifications
-            </NavLink>
-            @if (collapseNotifMenu)
-            {
-                <ul>
-                    <li class="nav-item px-3">
-                        <NavLink class="nav-link" href="Notifications/Settings">
-                            <MatIcon Icon="settings_remote"></MatIcon> Settings
-                        </NavLink>
-                    </li>
-                </ul>
             }
         </li>
         <li class="nav-item px-3">
