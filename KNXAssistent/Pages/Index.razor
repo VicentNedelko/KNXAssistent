@@ -55,7 +55,7 @@ else
     public void OnNotify()
     {
         NotificationService.Success("New message received", "Information");
-        StateHasChanged();
+        this.InvokeAsync(() => this.StateHasChanged());
     }
 
     public void Dispose()

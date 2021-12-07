@@ -53,6 +53,7 @@ namespace KNXManager.BusConnection
             ActiveInt.Name = (Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp)).FriendlyName;
             ActiveInt.Mac = Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp).MacAddress.ToString();
             ActiveInt.IndividualAddress = Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp).IndividualAddress.ToString();
+            ActiveInt.State = bus?.State.ToString();
         }
 
         public void StartMonitor()
@@ -60,15 +61,16 @@ namespace KNXManager.BusConnection
             gaSbcList = _fileService.ReadSbcFromFile();
             bus = new(new KnxIpTunnelingConnectorParameters(ActiveInt.Ip, 0x0e57, false));
             bus.Connect();
+            ConnectionState = bus?.State.ToString();
             bus.GroupValueReceived += Bus_GroupValueSbcReceived;
             bus.StateChanged += Bus_StateChanged;
+            OnGaReceived?.Invoke();
             _messService.AddInfoMessage($"Start monitoring on {ActiveInt.Ip}-{ActiveInt.Name}");
         }
 
         private void Bus_StateChanged(BusConnectionStatus obj)
         {
             ConnectionState = obj.ToString();
-            bus.Dispose();
             _fileService.WriteSbcValueToFile(gaValues);
             _messService.AddWarningMessage($"Interface change state to - {obj}");
         }
@@ -76,7 +78,6 @@ namespace KNXManager.BusConnection
         public void StopMonitor()
         {
             bus.GroupValueReceived -= Bus_GroupValueSbcReceived;
-            bus.StateChanged -= Bus_StateChanged;
             bus.Disconnect();
             bus.Dispose();
             _fileService.WriteSbcValueToFile(gaValues);

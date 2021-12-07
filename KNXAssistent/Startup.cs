@@ -35,8 +35,7 @@ namespace KNXAssistent
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddMatBlazor();
-            services.AddScoped<IBusCommunicator, BusCommunicator>();
-            services.AddSingleton<WeatherForecastService>();
+            services.AddScoped<IBusCommunicator, BusCommunicator>();;
             services.AddScoped<IBot, Bot>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IMessService, MessService>();

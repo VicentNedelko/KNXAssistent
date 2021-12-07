@@ -16,7 +16,7 @@
         <MatStringField ReadOnly="true" Value="@busCommunicator.ActiveInt.Name" Label="Interface NAME"></MatStringField>
     </p>
     <p>
-        <MatStringField ReadOnly="true" Value="@ConnectionState" Label="Interface STATE"></MatStringField>
+        <MatStringField ReadOnly="true" Value="@busCommunicator.ConnectionState" Label="Interface STATE"></MatStringField>
     </p>
 </Div>
 <MatDivider></MatDivider>
@@ -78,21 +78,26 @@ else
     bool startBtnDsbl = false;
     bool stopBtnDsbl = false;
 
-    [Parameter]
-    public string ConnectionState { get; set; }
-
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        stopBtnDsbl = true;
-        ConnectionState = busCommunicator.ConnectionState;
-        busCommunicator.OnGaReceived += OnNotify;
+        if(busCommunicator.bus.State == Knx.Bus.Common.BusConnectionStatus.Connected)
+        {
+            startBtnDsbl = true;
+            stopBtnDsbl = false;
+        }
+        else
+        {
+            startBtnDsbl = false;
+            stopBtnDsbl = true;
+        }
     }
 
 
     void OnStartClick()
     {
         busCommunicator.StartMonitor();
+        busCommunicator.OnGaReceived += OnNotify;
         startBtnDsbl = true;
         stopBtnDsbl = false;
     }
