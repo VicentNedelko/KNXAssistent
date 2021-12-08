@@ -40,14 +40,20 @@ namespace KNXManager.BusConnection
 
         public string CheckConnection(string interfaceIp)
         {
-            bus = new Bus(new KnxIpTunnelingConnectorParameters(interfaceIp, 0x0e57, false));
-            using (bus)
+            string state = string.Empty;
+            if(bus is not null)
             {
-                bus.Connect();
-                string state = bus.CheckCommunication().ToString();
-                bus.Disconnect();
-                return state;
+                state = bus.CheckCommunication().ToString();
             }
+            else
+            {
+                using (bus = new Bus(new KnxIpTunnelingConnectorParameters(interfaceIp, 0x0e57, false)))
+                {
+                    bus.Connect(); 
+                    state = bus.CheckCommunication().ToString();
+                }
+            }
+            return state;
         }
 
         public void SetInterface(string interfaceIp)

@@ -3,40 +3,43 @@
 @using DAL.Models
 @using KNXAssistent.Components
 @inject IBusCommunicator busCommunicator
-    
-    <ActiveInterface Interface="@busCommunicator.ActiveInt" OnRemove="@InterfaceSelected"></ActiveInterface>
-    <MatDivider></MatDivider>
-    <FullInterfacesList Interfaces="@GetInterfacesList()" OnInterfaceSelected="@InterfaceSelected"></FullInterfacesList>
+
+<ActiveInterface Interface="@busCommunicator.ActiveInt" OnRemove="@InterfaceSelected"></ActiveInterface>
+<MatDivider></MatDivider>
+<FullInterfacesList Interfaces="@GetInterfacesList()" OnInterfaceSelected="@InterfaceSelected"></FullInterfacesList>
 
     @code {
 
-    List<KnxInterface> knxInterfaces;
+    List<KnxInterface> knxInterfaces = new();
 
-        private List<KnxInterface> GetInterfacesList()
+    private List<KnxInterface> GetInterfacesList()
+    {
+        if (busCommunicator.bus is not null && busCommunicator.bus.State == Knx.Bus.Common.BusConnectionStatus.Connected)
         {
-            knxInterfaces = new();
-            if (busCommunicator.Interfaces.Length != 0)
-            {
-                foreach (var item in busCommunicator.Interfaces)
-                {
-                    if (item.IpAddress.ToString() != busCommunicator.ActiveInt.Ip)
-                    {
-                        knxInterfaces.Add(
-                            new KnxInterface
-                            {
-                                Ip = item.IpAddress.ToString(),
-                                Name = item.FriendlyName,
-                                State = busCommunicator.CheckConnection(item.IpAddress.ToString()),
-                                Mac = item.MacAddress.ToString(),
-                                IndividualAddress = item.IndividualAddress,
-                            }
-                        );
-                    }
-
-                }
-            }
             return knxInterfaces;
         }
+        if (busCommunicator.Interfaces.Length != 0)
+        {
+            foreach (var item in busCommunicator.Interfaces)
+            {
+                if (item.IpAddress.ToString() != busCommunicator.ActiveInt.Ip)
+                {
+                    knxInterfaces.Add(
+                        new KnxInterface
+                        {
+                            Ip = item.IpAddress.ToString(),
+                            Name = item.FriendlyName,
+                            State = busCommunicator.CheckConnection(item.IpAddress.ToString()),
+                            Mac = item.MacAddress.ToString(),
+                            IndividualAddress = item.IndividualAddress,
+                        }
+                    );
+                }
+
+            }
+        }
+        return knxInterfaces;
+    }
 
     void InterfaceSelected()
     {

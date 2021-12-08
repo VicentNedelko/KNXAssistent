@@ -83,7 +83,7 @@ else
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        if(busCommunicator.bus is not null)
+        if(busCommunicator.bus.State == Knx.Bus.Common.BusConnectionStatus.Connected)
         {
             startBtnDsbl = true;
             stopBtnDsbl = false;
