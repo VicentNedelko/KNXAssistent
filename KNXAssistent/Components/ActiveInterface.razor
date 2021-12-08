@@ -4,7 +4,7 @@
 
 <h4>Active Interface</h4>
 
-@if(!String.IsNullOrEmpty(Interface.Ip))
+@if (!String.IsNullOrEmpty(Interface.Ip))
 {
     <MatList>
         <MatListItem>IP - @Interface.Ip</MatListItem>
@@ -12,7 +12,15 @@
         <MatListItem>MAC - @Interface.Mac</MatListItem>
         <MatListItem>State - @Interface.State</MatListItem>
     </MatList>
-    <MatButton OnClick="@RemoveInt">Remove</MatButton>
+    @if (!busCommunicator.bus.IsConnected)
+    {
+        <MatButton OnClick="@RemoveInt">Remove</MatButton>
+    }
+    else
+    {
+        <p>Interface is in use. To Remove it, please, stop connection first.</p>
+    }
+
 }
 else
 {
@@ -37,6 +45,10 @@ else
         busCommunicator.ActiveInt.Ip = string.Empty;
         busCommunicator.ActiveInt.Name = string.Empty;
         busCommunicator.ActiveInt.Mac = string.Empty;
+        if (busCommunicator.bus.IsConnected)
+        {
+            busCommunicator.bus.Dispose();
+        }
         await OnRemove.InvokeAsync();
     }
 

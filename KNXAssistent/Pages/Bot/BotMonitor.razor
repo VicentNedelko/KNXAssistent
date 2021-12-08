@@ -48,7 +48,7 @@
                         <TableRowCell>@v.Address</TableRowCell>
                         <TableRowCell>@v.Value</TableRowCell>
                         <TableRowCell>@v.Unit</TableRowCell>
-                        <TableRowCell>Notification</TableRowCell>
+                        <TableRowCell>@v.Notification</TableRowCell>
                     </Blazorise.TableRow>
                 }
             </TableBody>
@@ -83,7 +83,7 @@ else
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        if(busCommunicator.bus.State == Knx.Bus.Common.BusConnectionStatus.Connected)
+        if(busCommunicator.bus.IsConnected)
         {
             startBtnDsbl = true;
             stopBtnDsbl = false;

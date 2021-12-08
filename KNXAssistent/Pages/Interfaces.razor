@@ -8,18 +8,15 @@
 <MatDivider></MatDivider>
 <FullInterfacesList Interfaces="@GetInterfacesList()" OnInterfaceSelected="@InterfaceSelected"></FullInterfacesList>
 
-    @code {
+@code {
 
-    List<KnxInterface> knxInterfaces = new();
+    List<KnxInterface> knxInterfaces;
 
     private List<KnxInterface> GetInterfacesList()
     {
-        if (busCommunicator.bus is not null && busCommunicator.bus.State == Knx.Bus.Common.BusConnectionStatus.Connected)
-        {
-            return knxInterfaces;
-        }
         if (busCommunicator.Interfaces.Length != 0)
         {
+            knxInterfaces = new();
             foreach (var item in busCommunicator.Interfaces)
             {
                 if (item.IpAddress.ToString() != busCommunicator.ActiveInt.Ip)
@@ -46,4 +43,4 @@
         StateHasChanged();
     }
 
-    }
+}
