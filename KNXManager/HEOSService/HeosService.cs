@@ -2,6 +2,7 @@
 using DreamNucleus.Heos.Commands.Player;
 using DreamNucleus.Heos.Infrastructure.Heos;
 using DreamNucleus.Heos.Infrastructure.Telnet;
+using KNXManager.MessageService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,15 +18,21 @@ namespace KNXManager.HEOSService
 {
     public class HeosService : IHeosService
     {
-        public event Action<string> OnDenonCheck;
+        public event Action OnDenonCheck;
         public GetPlayerResponse[] PlayersList { get; set; }
+        private readonly IMessService _messService;
+        public MacIpPair[] Denons { get; set; }
+
+        public HeosService(IMessService messService)
+        {
+            _messService = messService;
+        }
 
         public async Task FindPlayersAsync()
         {
             List<MacIpPair> mip = new();
             List<MacIpPair> denons = new();
             List<GetPlayerResponse> getPlayers = new();
-            List<string> statuses = new();
 
             System.Diagnostics.Process pProcess = new();
             pProcess.StartInfo.FileName = "arp";
@@ -55,37 +62,41 @@ namespace KNXManager.HEOSService
                 }
             }
 
-            foreach(var denon in denons)
+            for(int i = 0; i < denons.Count; i++)
             {
                 Ping ping = new();
-                IPAddress ip = IPAddress.Parse(denon.IpAddress);
+                IPAddress ip = IPAddress.Parse(denons[i].IpAddress);
                 PingReply reply = ping.Send(ip);
                 if (reply.Status == IPStatus.Success)
                 {
                     try
                     {
-                        var telnetClient = new SimpleTelnetClient(denon.IpAddress);
+                        var telnetClient = new SimpleTelnetClient(denons[i].IpAddress);
                         var heosClient = new HeosClient(telnetClient, CancellationToken.None);
                         var commandProcessor = new CommandProcessor(heosClient);
                         var plyrs = await commandProcessor.Execute(new GetPlayersCommand());
                         foreach (var p in plyrs.Payload)
                         {
                             getPlayers.Add(p);
-                            OnDenonCheck?.Invoke($"Denon added successfully - {p.Pid} & {p.Ip}");
+                            _messService.AddInfoMessage($"Denon added successfully - {p.Pid} & {p.Ip}");
+                            denons[i].Status = "Added successfully";
                         }
                     }
                     catch
                     {
-                        OnDenonCheck?.Invoke($"Denon can't be added - {denon.IpAddress} & Ping - {reply.Status}. TelNet Client failed.");
+                        _messService.AddWarningMessage($"Denon can't be added - {denons[i].IpAddress} & Ping - {reply.Status}. TelNet Client failed.");
+                        denons[i].Status = "TelNet Client failed";
                     }
 
                 }
                 else
                 {
-                    OnDenonCheck?.Invoke($"{denon.IpAddress} --> Status : {reply.Status}");
+                    _messService.AddDangerMessage($"{denons[i].IpAddress} --> Status : {reply.Status}");
                 }
             }
             PlayersList = getPlayers.ToArray();
+            Denons = denons.ToArray();
+            OnDenonCheck?.Invoke();
         }
     }
 }
