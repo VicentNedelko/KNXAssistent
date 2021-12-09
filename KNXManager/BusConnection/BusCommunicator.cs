@@ -51,7 +51,7 @@ namespace KNXManager.BusConnection
             ActiveInt.Name = (Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp)).FriendlyName;
             ActiveInt.Mac = Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp).MacAddress.ToString();
             ActiveInt.IndividualAddress = Interfaces.FirstOrDefault(i => i.IpAddress.ToString() == interfaceIp).IndividualAddress.ToString();
-            ActiveInt.State = bus?.State.ToString();
+            ActiveInt.State = (bus is not null) ? bus.State.ToString() : "Not connected to KNX";
         }
 
         public void StartMonitor()
@@ -68,7 +68,7 @@ namespace KNXManager.BusConnection
 
         private void Bus_StateChanged(BusConnectionStatus obj)
         {
-            ConnectionState = obj.ToString();
+            ActiveInt.State = obj.ToString();
             _fileService.WriteSbcValueToFile(gaValues);
             _messService.AddWarningMessage($"Interface change state to - {obj}");
         }
@@ -84,7 +84,7 @@ namespace KNXManager.BusConnection
 
         private void Bus_GroupValueSbcReceived(GroupValueEventArgs obj)
         {
-            if (gaSbcList.Any(ga => ga.Address == obj.Address))
+            if (gaSbcList.Any(ga => ga.Address == obj.Address) && bus.IsConnected)
             {
                 var checkedGA = gaSbcList.First(ga => ga.Address == obj.Address);
                 var addingGA = new GaValue

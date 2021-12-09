@@ -12,22 +12,19 @@
         <MatListItem>MAC - @Interface.Mac</MatListItem>
         <MatListItem>State - @Interface.State</MatListItem>
     </MatList>
-    @if (!busCommunicator.bus.IsConnected)
-    {
-        <MatButton OnClick="@RemoveInt">Remove</MatButton>
-    }
-    else
+    @if (busCommunicator.bus is not null && busCommunicator.bus.IsConnected)
     {
         <p>Interface is in use. To Remove it, please, stop connection first.</p>
     }
-
+    else
+    {
+        <MatButton OnClick="@RemoveInt">Remove</MatButton>
+    }
 }
 else
 {
     <p>No active Interface selected.</p>
 }
-
-
 
 
 @code {
@@ -45,7 +42,7 @@ else
         busCommunicator.ActiveInt.Ip = string.Empty;
         busCommunicator.ActiveInt.Name = string.Empty;
         busCommunicator.ActiveInt.Mac = string.Empty;
-        if (busCommunicator.bus.IsConnected)
+        if (busCommunicator.bus is not null && busCommunicator.bus.IsConnected)
         {
             busCommunicator.bus.Dispose();
         }

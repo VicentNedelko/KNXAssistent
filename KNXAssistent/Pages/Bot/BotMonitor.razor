@@ -16,7 +16,7 @@
         <MatStringField ReadOnly="true" Value="@busCommunicator.ActiveInt.Name" Label="Interface NAME"></MatStringField>
     </p>
     <p>
-        <MatStringField ReadOnly="true" Value="@busCommunicator.ConnectionState" Label="Interface STATE"></MatStringField>
+        <MatStringField ReadOnly="true" Value="@busCommunicator.ActiveInt.State" Label="Interface STATE"></MatStringField>
     </p>
 </Div>
 <MatDivider></MatDivider>
@@ -83,7 +83,7 @@ else
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        if(busCommunicator.bus.IsConnected)
+        if(busCommunicator.bus is not null && busCommunicator.bus.IsConnected)
         {
             startBtnDsbl = true;
             stopBtnDsbl = false;

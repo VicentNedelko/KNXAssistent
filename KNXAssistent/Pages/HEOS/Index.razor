@@ -1,0 +1,64 @@
+﻿@page "/HEOS/Index"
+
+@using KNXManager.HEOSService
+@using KNXManager.MessageService
+@inject IHeosService heosService
+@inject IMessService messService
+
+<h3>HEOS Service</h3>
+@if (heosService.PlayersList is not null && heosService.PlayersList.Length != 0)
+{
+    <Table FixedHeader="true" FixedHeaderTableHeight="300px">
+        <TableHeader>
+            <Blazorise.TableRow>
+                <TableHeaderCell>Num</TableHeaderCell>
+                <TableHeaderCell>Name</TableHeaderCell>
+                <TableHeaderCell>Pid</TableHeaderCell>
+                <TableHeaderCell>Version</TableHeaderCell>
+                <TableHeaderCell>Model</TableHeaderCell>
+                <TableHeaderCell>IP</TableHeaderCell>
+            </Blazorise.TableRow>
+        </TableHeader>
+        <TableBody>
+            @foreach (var denon in heosService.PlayersList)
+            {
+                <Blazorise.TableRow>
+                    <TableRowHeader>@(heosService.PlayersList.IndexOf(denon) + 1)</TableRowHeader>
+                    <TableRowCell>@denon.Name</TableRowCell>
+                    <TableRowCell>@denon.Pid</TableRowCell>
+                    <TableRowCell>@denon.Version</TableRowCell>
+                    <TableRowCell>@denon.Model</TableRowCell>
+                    <TableRowCell>@denon.Ip</TableRowCell>
+                </Blazorise.TableRow>
+            }
+
+        </TableBody>
+    </Table>
+}
+else
+{
+    <Alert Color="Color.Info" Visible="true">
+        <AlertMessage>HEOS : </AlertMessage>
+        <AlertDescription>No Players found yet.</AlertDescription>
+    </Alert>
+}
+
+<MatButton Raised="true" OnClick="@OnScanLanClick">Scan LAN</MatButton>
+
+@code {
+    void OnScanLanClick()
+    {
+        heosService.FindPlayersAsync();
+    }
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        heosService.OnDenonCheck += OnNotifyDenon;
+    }
+
+    public void OnNotifyDenon(string message)
+    {
+        messService.AddInfoMessage(message);
+        StateHasChanged();
+    }
+}
