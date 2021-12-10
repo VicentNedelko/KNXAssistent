@@ -18,14 +18,15 @@ namespace KNXManager.HEOSService
 {
     public class HeosService : IHeosService
     {
-        public event Action OnDenonCheck;
         public GetPlayerResponse[] PlayersList { get; set; }
         private readonly IMessService _messService;
         public MacIpPair[] Denons { get; set; }
+        public bool IsInProcess { get; set; }
 
         public HeosService(IMessService messService)
         {
             _messService = messService;
+            IsInProcess = false;
         }
 
         public async Task FindPlayersAsync()
@@ -33,7 +34,6 @@ namespace KNXManager.HEOSService
             List<MacIpPair> mip = new();
             List<MacIpPair> denons = new();
             List<GetPlayerResponse> getPlayers = new();
-
             System.Diagnostics.Process pProcess = new();
             pProcess.StartInfo.FileName = "arp";
             pProcess.StartInfo.Arguments = "-a ";
@@ -96,7 +96,7 @@ namespace KNXManager.HEOSService
             }
             PlayersList = getPlayers.ToArray();
             Denons = denons.ToArray();
-            OnDenonCheck?.Invoke();
+            IsInProcess = false;
         }
     }
 }

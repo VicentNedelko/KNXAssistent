@@ -11,6 +11,7 @@ using Knx.Bus.Common.DatapointTypes;
 using KNXManager.MessageService;
 using System;
 using KNXManager.BotManager;
+using System.Threading.Tasks;
 
 namespace KNXManager.BusConnection
 {
@@ -24,7 +25,7 @@ namespace KNXManager.BusConnection
         public Bus bus { get; set; }
         public List<GaValue> gaValues { get; set; }
         public List<GA> gaSbcList { get; set; }
-        public event Action OnGaReceived;
+        public event Func<Task> OnGaReceived;
 
         public string Information { get; set; }
         public string ConnectionState { get; set; } = "Not Applied";

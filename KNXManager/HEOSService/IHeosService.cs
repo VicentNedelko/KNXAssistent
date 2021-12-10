@@ -10,7 +10,8 @@ namespace KNXManager.HEOSService
     public interface IHeosService
     {
         public Task FindPlayersAsync();
-        public event Action OnDenonCheck;
+        //public event Action OnDenonCheck;
+        public bool IsInProcess { get; set; }
         public GetPlayerResponse[] PlayersList { get; set; }
         public MacIpPair[] Denons { get; set; }
 

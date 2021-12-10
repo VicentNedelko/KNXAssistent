@@ -112,10 +112,16 @@ else
         busCommunicator.OnGaReceived -= OnNotify;
     }
 
-    public void OnNotify()
+    public async Task OnNotify()
     {
-        this.InvokeAsync(() => this.StateHasChanged());
-        NotificationService.Info($"GA - {busCommunicator.gaValues.Last().Address} receive Value = {busCommunicator.gaValues.Last().Value}");
+        await this.InvokeAsync(() => StateHasChanged());
+        ShowWarningNotification();
     }
+
+    Task ShowWarningNotification()
+    {
+        return NotificationService.Warning( "This is a simple notification message!", "Hello" );
+    }
+
 
 }

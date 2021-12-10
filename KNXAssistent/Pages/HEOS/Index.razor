@@ -6,83 +6,101 @@
 @inject IMessService messService
 
 <h3>HEOS Service</h3>
-@if (heosService.PlayersList is not null && heosService.PlayersList.Length != 0)
-{
-    <Table FixedHeader="true" FixedHeaderTableHeight="300px">
-        <TableHeader>
-            <Blazorise.TableRow>
-                <TableHeaderCell>Num</TableHeaderCell>
-                <TableHeaderCell>Name</TableHeaderCell>
-                <TableHeaderCell>Pid</TableHeaderCell>
-                <TableHeaderCell>Version</TableHeaderCell>
-                <TableHeaderCell>Model</TableHeaderCell>
-                <TableHeaderCell>IP</TableHeaderCell>
-            </Blazorise.TableRow>
-        </TableHeader>
-        <TableBody>
-            @foreach (var player in heosService.PlayersList)
-            {
-                <Blazorise.TableRow>
-                    <TableRowHeader>@(heosService.PlayersList.IndexOf(player) + 1)</TableRowHeader>
-                    <TableRowCell>@player.Name</TableRowCell>
-                    <TableRowCell>@player.Pid</TableRowCell>
-                    <TableRowCell>@player.Version</TableRowCell>
-                    <TableRowCell>@player.Model</TableRowCell>
-                    <TableRowCell>@player.Ip</TableRowCell>
-                </Blazorise.TableRow>
-            }
 
-        </TableBody>
-    </Table>
+@if (heosService.IsInProcess)
+{
+    <Alert Color="Color.Warning" Visible>
+        <AlertMessage>HEOS searching...</AlertMessage>
+        <AlertDescription>We are trying to find DENON devices. Please, wait...</AlertDescription>
+    </Alert>
 }
 else
 {
-    <Alert Color="Color.Info" Visible="true">
-        <AlertMessage>HEOS : </AlertMessage>
-        <AlertDescription>No HEOS Players found yet.</AlertDescription>
-    </Alert>
-}
-<MatDivider></MatDivider>
-@if (heosService.Denons is not null && heosService.Denons.Count() != 0)
-{
-    <p>Full DENON devices List in LAN</p>
-    <Table FixedHeader="true" FixedHeaderTableHeight="300px">
-        <TableHeader>
-            <Blazorise.TableRow>
-                <TableHeaderCell>Num</TableHeaderCell>
-                <TableHeaderCell>IP</TableHeaderCell>
-                <TableHeaderCell>STATUS</TableHeaderCell>
-            </Blazorise.TableRow>
-        </TableHeader>
-        <TableBody>
-            @foreach (var denonDevice in heosService.Denons)
-            {
-                <Blazorise.TableRow>
-                    <TableRowHeader>@(heosService.Denons.IndexOf(denonDevice) + 1)</TableRowHeader>
-                    <TableRowCell>@denonDevice.IpAddress</TableRowCell>
-                    <TableRowCell>@denonDevice.Status</TableRowCell>
-                </Blazorise.TableRow>
-            }
-        </TableBody>
-    </Table>
-}
-
-<MatButton Raised="true" OnClick="@OnScanLanClick">Scan LAN</MatButton>
-
-@code {
-    void OnScanLanClick()
+    if (heosService.PlayersList is not null && heosService.PlayersList.Length != 0)
     {
-        heosService.FindPlayersAsync();
+        <Table FixedHeader="true" FixedHeaderTableHeight="500px">
+            <TableHeader>
+                <Blazorise.TableRow>
+                    <TableHeaderCell>Num</TableHeaderCell>
+                    <TableHeaderCell>Name</TableHeaderCell>
+                    <TableHeaderCell>Pid</TableHeaderCell>
+                    <TableHeaderCell>Version</TableHeaderCell>
+                    <TableHeaderCell>Model</TableHeaderCell>
+                    <TableHeaderCell>IP</TableHeaderCell>
+                </Blazorise.TableRow>
+            </TableHeader>
+            <TableBody>
+                @foreach (var player in heosService.PlayersList)
+                {
+                    <Blazorise.TableRow>
+                        <TableRowHeader>@(heosService.PlayersList.IndexOf(player) + 1)</TableRowHeader>
+                        <TableRowCell>@player.Name</TableRowCell>
+                        <TableRowCell>@player.Pid</TableRowCell>
+                        <TableRowCell>@player.Version</TableRowCell>
+                        <TableRowCell>@player.Model</TableRowCell>
+                        <TableRowCell>@player.Ip</TableRowCell>
+                    </Blazorise.TableRow>
+                }
+
+            </TableBody>
+        </Table>
+    }
+    else
+    {
+        <Alert Color="Color.Info" Visible="true">
+            <AlertMessage>HEOS : </AlertMessage>
+            <AlertDescription>No HEOS Players found yet.</AlertDescription>
+        </Alert>
+    }
+    <MatDivider></MatDivider>
+    @if (heosService.Denons is not null && heosService.Denons.Count() != 0)
+    {
+        <p>Full DENON devices List in LAN</p>
+        <Table FixedHeader="true" FixedHeaderTableHeight="300px">
+            <TableHeader>
+                <Blazorise.TableRow>
+                    <TableHeaderCell>Num</TableHeaderCell>
+                    <TableHeaderCell>IP</TableHeaderCell>
+                    <TableHeaderCell>STATUS</TableHeaderCell>
+                </Blazorise.TableRow>
+            </TableHeader>
+            <TableBody>
+                @foreach (var denonDevice in heosService.Denons)
+                {
+                    <Blazorise.TableRow>
+                        <TableRowHeader>@(heosService.Denons.IndexOf(denonDevice) + 1)</TableRowHeader>
+                        <TableRowCell>@denonDevice.IpAddress</TableRowCell>
+                        <TableRowCell>@denonDevice.Status</TableRowCell>
+                    </Blazorise.TableRow>
+                }
+            </TableBody>
+        </Table>
     }
 
-    protected override void OnInitialized()
+    <MatButton Raised="true" OnClick="@OnScanLanClick">Scan LAN</MatButton>
+}
+
+
+
+@code {
+
+    async Task OnScanLanClick()
+    {
+        heosService.IsInProcess = true;
+        StateHasChanged();
+        await Task.Run(() => heosService.FindPlayersAsync());
+        heosService.IsInProcess = false;
+        StateHasChanged();
+    }
+
+@*    protected override void OnInitialized()
     {
         base.OnInitialized();
         heosService.OnDenonCheck += OnNotify;
-    }
+    }*@
 
     void OnNotify()
     {
-        this.InvokeAsync(() => StateHasChanged());
+        StateHasChanged();
     }
 }
