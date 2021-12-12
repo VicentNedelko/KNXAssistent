@@ -14,7 +14,7 @@ namespace KNXManager.MessageService
             Messages = new();
         }
 
-        public event Action Notify;
+        public event Func<Task> Notify;
 
         public void AddDangerMessage(string message)
         {

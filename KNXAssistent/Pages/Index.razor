@@ -52,10 +52,10 @@ else
         messService.Notify += OnNotify;
 
     }
-    public void OnNotify()
+    public async Task OnNotify()
     {
         NotificationService.Success("New message received", "Information");
-        this.InvokeAsync(() => this.StateHasChanged());
+        await this.InvokeAsync(() => this.StateHasChanged());
     }
 
     public void Dispose()
