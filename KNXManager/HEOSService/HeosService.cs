@@ -56,7 +56,9 @@ namespace KNXManager.HEOSService
             foreach (var machine in mip)
             {
                 var mac = machine.MacAddress.Split(new char[] { '-' });
-                if (mac[0] == "00" & mac[1] == "05" & mac[2] == "cd")
+                if ((mac[0] == "00" & mac[1] == "05" & mac[2] == "cd")
+                    || (mac[0] == "00" & mac[1] == "06" & mac[2] == "78")
+                    || (mac[0] == "8c" & mac[1] == "a9" & mac[2] == "6f"))
                 {
                     denons.Add(machine);
                 }

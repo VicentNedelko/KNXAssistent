@@ -200,7 +200,7 @@ else
                     LowerTh = lowerTh,
                 });
                 fileService.WriteSbcToFile(gaSBC);
-                Thread timerThread = new Thread(new ThreadStart(() => TimerCount(2000)));
+                Thread timerThread = new(new ThreadStart(() => TimerCount(2000)));
                 timerThread.Start();
                 messService.AddInfoMessage($"New GA {valueGA} added");
                 NotificationService.Info($"New GA {valueGA} added", "Information");
@@ -221,9 +221,9 @@ else
         dialogIsOpen = false;
     }
 
-    void GetGaAtStartUp()
+    async Task GetGaAtStartUpAsync()
     {
-        gaSBC = fileService.ReadSbcFromFile();
+        gaSBC = await fileService.ReadSbcFromFileAsync();
     }
 
     void RemoveGA(string gaAddress)
@@ -239,9 +239,9 @@ else
         StateHasChanged();
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        GetGaAtStartUp();
+        await GetGaAtStartUpAsync();
     }
 
     void TimerCount(int period)

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace KNXManager.FileService
 {
@@ -19,11 +20,11 @@ namespace KNXManager.FileService
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public List<GA> ReadSbcFromFile()
+        public async Task<List<GA>> ReadSbcFromFileAsync()
         {
             var path = Path.Combine(_webHostEnvironment.WebRootPath, "files", Secret.GASbcList);
             using StreamReader sr = new(path);
-            var jsonData = sr.ReadToEnd();
+            var jsonData = await sr.ReadToEndAsync();
             sr.Close();
             List<GA> result = new();
             try

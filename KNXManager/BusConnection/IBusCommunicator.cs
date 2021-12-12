@@ -18,7 +18,7 @@ namespace KNXManager.BusConnection
         public string CheckConnection(string interfaceIp);
         public void SetInterface(string interfaceIp);
 
-        public void StartMonitor();
+        public Task StartMonitorAsync();
         public void StopMonitor();
     }
 }

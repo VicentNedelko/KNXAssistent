@@ -1,6 +1,6 @@
 ﻿using DAL.Models;
 using System.Collections.Generic;
-
+using System.Threading.Tasks;
 
 namespace KNXManager.FileService
 {
@@ -11,6 +11,6 @@ namespace KNXManager.FileService
         public void WriteThToFile(List<GAWithTh> gAWithThs);
         public void ClearSbcValueFile();
         public List<GAWithTh> ReadThFromFile();
-        public List<GA> ReadSbcFromFile();
+        public Task<List<GA>> ReadSbcFromFileAsync();
     }
 }

@@ -55,9 +55,9 @@ namespace KNXManager.BusConnection
             ActiveInt.State = (bus is not null) ? bus.State.ToString() : "Not connected to KNX";
         }
 
-        public void StartMonitor()
+        public async Task StartMonitorAsync()
         {
-            gaSbcList = _fileService.ReadSbcFromFile();
+            gaSbcList = await _fileService.ReadSbcFromFileAsync();
             bus = new(new KnxIpTunnelingConnectorParameters(ActiveInt.Ip, 0x0e57, false));
             bus.Connect();
             ConnectionState = bus?.State.ToString();

@@ -98,7 +98,7 @@ else
 
     void OnStartClick()
     {
-        busCommunicator.StartMonitor();
+        busCommunicator.StartMonitorAsync();
         busCommunicator.OnGaReceived += OnNotify;
         startBtnDsbl = true;
         stopBtnDsbl = false;
