@@ -87,17 +87,12 @@ else
     async Task OnScanLanClick()
     {
         heosService.IsInProcess = true;
-        StateHasChanged();
-        await Task.Run(() => heosService.FindPlayersAsync());
+        var task = Task.Run(() => heosService.FindPlayersAsync());
+        this.StateHasChanged();
+        await task;
         heosService.IsInProcess = false;
-        StateHasChanged();
+        this.StateHasChanged();
     }
-
-@*    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        heosService.OnDenonCheck += OnNotify;
-    }*@
 
     void OnNotify()
     {

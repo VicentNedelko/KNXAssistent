@@ -38,9 +38,9 @@
         return knxInterfaces;
     }
 
-    void InterfaceSelected()
+    async Task InterfaceSelected()
     {
-        StateHasChanged();
+        await this.InvokeAsync(() => StateHasChanged());
     }
 
 }
