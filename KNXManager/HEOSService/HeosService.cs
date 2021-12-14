@@ -29,11 +29,26 @@ namespace KNXManager.HEOSService
             IsInProcess = false;
         }
 
+        public static Task<PingReply> CheckNodeByIPAsync(string ip)
+        {
+            Ping ping = new();
+            return ping.SendPingAsync(IPAddress.Parse(ip), 2000);
+        }
+
         public async Task FindPlayersAsync()
         {
+            List<Task<PingReply>> pingReplies = new();
             List<MacIpPair> mip = new();
             List<MacIpPair> denons = new();
             List<GetPlayerResponse> getPlayers = new();
+
+            for (int i = 0; i <= 255; i++)
+            {
+                string address = string.Concat("192.168.5.", i);
+                pingReplies.Add(CheckNodeByIPAsync(address));
+            }
+            Task.WaitAll(pingReplies.ToArray());
+
             System.Diagnostics.Process pProcess = new();
             pProcess.StartInfo.FileName = "arp";
             pProcess.StartInfo.Arguments = "-a ";
