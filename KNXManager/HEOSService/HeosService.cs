@@ -29,10 +29,18 @@ namespace KNXManager.HEOSService
             IsInProcess = false;
         }
 
-        public static Task<PingReply> CheckNodeByIPAsync(string ip)
+        internal static Task<PingReply> PingNodesByIPAsync(string ip)
         {
             Ping ping = new();
-            return ping.SendPingAsync(IPAddress.Parse(ip), 2000);
+            return Task.Run(() => ping.Send(IPAddress.Parse(ip)));
+        }
+
+        internal static byte GetSubnetworkValue()
+        {
+            IPAddress[] localIPs = Dns.GetHostAddresses(Dns.GetHostName());
+            var myIP = localIPs.FirstOrDefault(ip => ip.AddressFamily.ToString() == "InterNetwork");
+            var byteCollection = myIP.GetAddressBytes() ?? null;
+            return (byteCollection is not null) ? byteCollection[2] : (byte)0;
         }
 
         public async Task FindPlayersAsync()
@@ -44,8 +52,8 @@ namespace KNXManager.HEOSService
 
             for (int i = 0; i <= 255; i++)
             {
-                string address = string.Concat("192.168.5.", i);
-                pingReplies.Add(CheckNodeByIPAsync(address));
+                string address = string.Concat("192.168.", GetSubnetworkValue(), ".", i);
+                pingReplies.Add(PingNodesByIPAsync(address));
             }
             Task.WaitAll(pingReplies.ToArray());
 
