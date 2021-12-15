@@ -13,7 +13,6 @@ namespace KNXManager.FileService
     public class FileService : IFileService
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
-        readonly List<GA> gaList = new();
 
         public FileService(IWebHostEnvironment webHostEnvironment)
         {
@@ -99,5 +98,14 @@ namespace KNXManager.FileService
             sw.Close();
         }
 
+        public void WriteACUToFile()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<ACUnit> ReadACUFromFile()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
