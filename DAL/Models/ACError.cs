@@ -7,11 +7,10 @@ using System.Threading.Tasks;
 
 namespace DAL.Models
 {
-    public class ACUnit
+    public class ACError
     {
         public ACUBrand AcuBrand { get; set; }
+        public string Code { get; set; }
         public string Description { get; set; }
-        public string ErrorFlagGA { get; set; }
-        public string ErrorValueGA { get; set; }
     }
 }

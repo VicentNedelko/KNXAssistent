@@ -98,12 +98,30 @@ namespace KNXManager.FileService
             sw.Close();
         }
 
-        public void WriteACUToFile()
+        public async Task<List<ACUnit>> ReadACUFromFileAsync()
+        {
+            var path = Path.Combine(_webHostEnvironment.WebRootPath, "files", Secret.AcuList);
+            using StreamReader sr = new(path);
+            var jsonData = sr.BaseStream;
+            return await JsonSerializer.DeserializeAsync<List<ACUnit>>(jsonData);
+        }
+
+        public List<ACError> ReadErrorFromFile()
         {
             throw new NotImplementedException();
         }
 
-        public List<ACUnit> ReadACUFromFile()
+        public List<ACUnit> ReadACUsFromFile()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WriteACUsToFile(List<ACUnit> Acus)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WriteAcuErrorsToFile(List<ACError> errors)
         {
             throw new NotImplementedException();
         }

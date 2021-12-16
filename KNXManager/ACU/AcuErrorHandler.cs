@@ -11,7 +11,7 @@ namespace KNXManager.ACU
     {
         public List<ACUnit> Acus { get; set; }
 
-        public string GetErrorDescriptionByCode(string code)
+        public string GetErrorDescriptionByCode(ACError error)
         {
             return "";
         }
