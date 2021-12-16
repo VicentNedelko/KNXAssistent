@@ -58,8 +58,11 @@ namespace KNXManager.BusConnection
         public async Task StartMonitorAsync()
         {
             gaSbcList = await _fileService.ReadSbcFromFileAsync();
-            bus = new(new KnxIpTunnelingConnectorParameters(ActiveInt.Ip, 0x0e57, false));
-            bus.Connect();
+            bus ??= new(new KnxIpTunnelingConnectorParameters(ActiveInt.Ip, 0x0e57, false));
+            if (!bus.IsConnected)
+            {
+                bus.Connect();
+            }
             ConnectionState = bus?.State.ToString();
             bus.GroupValueReceived += Bus_GroupValueSbcReceived;
             bus.StateChanged += Bus_StateChanged;
@@ -77,6 +80,7 @@ namespace KNXManager.BusConnection
         public void StopMonitor()
         {
             bus.GroupValueReceived -= Bus_GroupValueSbcReceived;
+            bus.StateChanged -= Bus_StateChanged;
             bus.Disconnect();
             bus.Dispose();
             _fileService.WriteSbcValueToFile(gaValues);
@@ -115,6 +119,23 @@ namespace KNXManager.BusConnection
                 if (checkedGA.Notification) { _bot.SendMessageAsync($"Info! {addingGA.Description} = {addingGA.Value} {addingGA.Unit}"); }
                 OnGaReceived?.Invoke();
             }
+        }
+
+        public void StartACUHandler()
+        {
+            bus.GroupValueReceived += Bus_ACUErrorHandler;
+            _messService.AddInfoMessage($"Start ACU Handling on {ActiveInt.Ip}-{ActiveInt.Name}");
+        }
+
+        private void Bus_ACUErrorHandler(GroupValueEventArgs obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void StopACUHandler()
+        {
+            bus.GroupValueReceived -= Bus_ACUErrorHandler;
+            _messService.AddInfoMessage($"Stop ACU Handling on {ActiveInt.Ip}-{ActiveInt.Name}");
         }
     }
 }

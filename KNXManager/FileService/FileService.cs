@@ -98,32 +98,39 @@ namespace KNXManager.FileService
             sw.Close();
         }
 
-        public async Task<List<ACUnit>> ReadACUFromFileAsync()
+        // ACU Service
+
+        public async Task<List<ACUnit>> ReadACUsFromFileAsync()
         {
             var path = Path.Combine(_webHostEnvironment.WebRootPath, "files", Secret.AcuList);
             using StreamReader sr = new(path);
-            var jsonData = sr.BaseStream;
-            return await JsonSerializer.DeserializeAsync<List<ACUnit>>(jsonData);
+            var jsonDataStream = sr.BaseStream;
+            return await JsonSerializer.DeserializeAsync<List<ACUnit>>(jsonDataStream);
         }
 
-        public List<ACError> ReadErrorFromFile()
+        public async Task<List<ACError>> ReadErrorFromFileAsync()
         {
-            throw new NotImplementedException();
+            var path = Path.Combine(_webHostEnvironment.WebRootPath, "files", Secret.AcuErrors);
+            using StreamReader sr = new(path);
+            var jsonDataStream = sr.BaseStream;
+            return await JsonSerializer.DeserializeAsync<List<ACError>>(jsonDataStream);
         }
 
-        public List<ACUnit> ReadACUsFromFile()
+        public async Task WriteACUsToFileAsync(List<ACUnit> Acus)
         {
-            throw new NotImplementedException();
+            var path = Path.Combine(_webHostEnvironment.WebRootPath, "files", Secret.AcuList);
+            using StreamWriter sw = new(path, false);
+            await JsonSerializer.SerializeAsync(sw.BaseStream, Acus);
+            await sw.WriteAsync(sw.BaseStream.ToString());
+            sw.Close();
         }
 
-        public void WriteACUsToFile(List<ACUnit> Acus)
+        public async Task WriteAcuErrorsToFileAsync(List<ACError> errors)
         {
-            throw new NotImplementedException();
-        }
-
-        public void WriteAcuErrorsToFile(List<ACError> errors)
-        {
-            throw new NotImplementedException();
+            var path = Path.Combine(_webHostEnvironment.WebRootPath, "files", Secret.AcuErrors);
+            using StreamWriter sw = new(path);
+            await JsonSerializer.SerializeAsync(sw.BaseStream, errors);
+            await sw.WriteAsync(sw.BaseStream.ToString());
         }
     }
 }

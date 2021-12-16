@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using KNXManager.MessageService;
 using KNXManager.HEOSService;
+using KNXManager.ACU;
 
 namespace KNXAssistent
 {
@@ -41,6 +42,7 @@ namespace KNXAssistent
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IMessService, MessService>();
             services.AddScoped<IHeosService, HeosService>();
+            services.AddScoped<IAcuErrorHandler, AcuErrorHandler>();
 
             services
               .AddBlazorise(options =>

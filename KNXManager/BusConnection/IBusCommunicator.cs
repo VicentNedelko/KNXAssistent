@@ -20,5 +20,10 @@ namespace KNXManager.BusConnection
 
         public Task StartMonitorAsync();
         public void StopMonitor();
+
+        // ACU Service
+
+        public void StartACUHandler();
+        public void StopACUHandler();
     }
 }

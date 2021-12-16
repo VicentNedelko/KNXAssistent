@@ -18,7 +18,7 @@ namespace KNXManager.Globals
         public static long GIRAChatId { get; } = 481679093;
         public static string BotName { get; } = "@GIRA_Notification_Bot (1987317825)";
         public static string AcuList { get; } = "AcuList.json";
-        public static string DaikinErrors { get; } = "DaikinErrors.json";
+        public static string AcuErrors { get; } = "AcuErrors.json";
         public static string MeErrors { get; } = "MeErrors.json";
     }
 }
