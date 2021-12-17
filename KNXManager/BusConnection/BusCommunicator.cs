@@ -20,6 +20,8 @@ namespace KNXManager.BusConnection
         private readonly IFileService _fileService;
         private readonly IMessService _messService;
         private readonly IBot _bot;
+        private int _handlerGvrNumber;
+        private int _handlerScNumber;
         public DiscoveryResult[] Interfaces { get; set; }
         public KnxInterface ActiveInt { get; set; } = new();
         public Bus bus { get; set; }
@@ -58,16 +60,33 @@ namespace KNXManager.BusConnection
         public async Task StartMonitorAsync()
         {
             gaSbcList = await _fileService.ReadSbcFromFileAsync();
+            LetsCommunicate();
+            bus.GroupValueReceived += Bus_GroupValueSbcReceived;
+            _handlerGvrNumber++;
+            bus.StateChanged += Bus_StateChanged;
+            _handlerScNumber++;
+            OnGaReceived?.Invoke();
+            _messService.AddInfoMessage($"Start monitoring on {ActiveInt.Ip}-{ActiveInt.Name}");
+        }
+
+        private void LetsCommunicate()
+        {
             bus ??= new(new KnxIpTunnelingConnectorParameters(ActiveInt.Ip, 0x0e57, false));
             if (!bus.IsConnected)
             {
                 bus.Connect();
             }
-            ConnectionState = bus?.State.ToString();
-            bus.GroupValueReceived += Bus_GroupValueSbcReceived;
-            bus.StateChanged += Bus_StateChanged;
-            OnGaReceived?.Invoke();
-            _messService.AddInfoMessage($"Start monitoring on {ActiveInt.Ip}-{ActiveInt.Name}");
+            ActiveInt.State = bus?.State.ToString();
+            //ConnectionState = bus?.State.ToString();
+        }
+
+        private void LetsStop()
+        {
+            if(_handlerGvrNumber + _handlerScNumber == 0)
+            {
+                bus.Disconnect();
+                bus.Dispose();
+            }
         }
 
         private void Bus_StateChanged(BusConnectionStatus obj)
@@ -80,9 +99,10 @@ namespace KNXManager.BusConnection
         public void StopMonitor()
         {
             bus.GroupValueReceived -= Bus_GroupValueSbcReceived;
+            _handlerGvrNumber--;
             bus.StateChanged -= Bus_StateChanged;
-            bus.Disconnect();
-            bus.Dispose();
+            _handlerScNumber--;
+            LetsStop();
             _fileService.WriteSbcValueToFile(gaValues);
             _messService.AddInfoMessage($"Stop monitoring on {ActiveInt.Ip}-{ActiveInt.Name}");
         }
@@ -123,6 +143,7 @@ namespace KNXManager.BusConnection
 
         public void StartACUHandler()
         {
+            LetsCommunicate();
             bus.GroupValueReceived += Bus_ACUErrorHandler;
             _messService.AddInfoMessage($"Start ACU Handling on {ActiveInt.Ip}-{ActiveInt.Name}");
         }
@@ -135,6 +156,7 @@ namespace KNXManager.BusConnection
         public void StopACUHandler()
         {
             bus.GroupValueReceived -= Bus_ACUErrorHandler;
+            LetsStop();
             _messService.AddInfoMessage($"Stop ACU Handling on {ActiveInt.Ip}-{ActiveInt.Name}");
         }
     }

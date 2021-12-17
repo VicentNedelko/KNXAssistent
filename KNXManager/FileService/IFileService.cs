@@ -16,6 +16,7 @@ namespace KNXManager.FileService
         // ACU services
         public Task<List<ACError>> ReadErrorFromFileAsync();
         public Task<List<ACUnit>> ReadACUsFromFileAsync();
+        public List<ACUnit> ReadACUsFromFile();
         public Task WriteACUsToFileAsync(List<ACUnit> Acus);
         public Task WriteAcuErrorsToFileAsync(List<ACError> errors);
         

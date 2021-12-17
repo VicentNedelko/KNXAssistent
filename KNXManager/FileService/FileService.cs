@@ -132,5 +132,14 @@ namespace KNXManager.FileService
             await JsonSerializer.SerializeAsync(sw.BaseStream, errors);
             await sw.WriteAsync(sw.BaseStream.ToString());
         }
+
+        public List<ACUnit> ReadACUsFromFile()
+        {
+            var path = Path.Combine(_webHostEnvironment.WebRootPath, "files", Secret.AcuList);
+            using StreamReader sr = new(path);
+            var jsonData = sr.ReadToEnd();
+            sr.Close();
+            return JsonSerializer.Deserialize<List<ACUnit>>(jsonData);
+        }
     }
 }

@@ -54,12 +54,12 @@
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="HEOS/Index" @onclick="() => collapseACUMenu = !collapseACUMenu">
+            <NavLink class="nav-link" href="HEOS/Index">
                 <MatIcon Icon="settings_input_svideo"></MatIcon>  HEOS Settings
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="ACU/Index">
+            <NavLink class="nav-link" href="ACU/Index" @onclick="() => collapseACUMenu = !collapseACUMenu">
                 <MatIcon Icon="ac_unit"></MatIcon>  ACU Errors
             </NavLink>
             @if (collapseACUMenu)
@@ -71,13 +71,8 @@
                         </NavLink>
                     </li>
                     <li class="nav-item px-3">
-                        <NavLink class="nav-link" href="ACU/DaikinErrorMapping">
-                            <MatIcon Icon="sms"></MatIcon> DAIKIN Error Mapping
-                        </NavLink>
-                    </li>
-                    <li class="nav-item px-3">
-                        <NavLink class="nav-link" href="ACU/MeErrorMapping">
-                            <MatIcon Icon="sms"></MatIcon> ME Error Mapping
+                        <NavLink class="nav-link" href="ACU/ErrorMapping">
+                            <MatIcon Icon="sms"></MatIcon> Mapping
                         </NavLink>
                     </li>
                 </ul>

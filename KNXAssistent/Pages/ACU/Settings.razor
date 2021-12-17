@@ -1,7 +1,26 @@
 ﻿@page "/ACU/Settings"
+@using KNXManager.FileService
+@using KNXManager.BusConnection
+@using KNXManager.ACU
+
+@inject IFileService fileService
+@inject IBusCommunicator busCommunicator
+@inject IAcuErrorHandler acuErrorHandler
 
 <h3>ACU Settings</h3>
+@if(acuErrorHandler.ACUnits.Count() == 0)
+{
+    <Alert Color="Color.Info" Visible>
+    <AlertMessage>ACU Error Handler : </AlertMessage>
+    <AlertDescription>NO ACUs added yet. To START monitoring, please add at least one ACU.</AlertDescription>
+</Alert>
+<MatButton Raised="true" OnClick="AddACUClick"></MatButton>
+}
 
 @code {
+    void AddACUClick()
+    {
+        
+    }
 
 }

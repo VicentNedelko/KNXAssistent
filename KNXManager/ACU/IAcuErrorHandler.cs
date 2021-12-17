@@ -9,7 +9,7 @@ namespace KNXManager.ACU
 {
     public interface IAcuErrorHandler
     {
-        public List<ACUnit> Acus { get; set; }
+        public List<ACUnit> ACUnits { get; set; }
         public string GetErrorDescriptionByCode(ACError error);
     }
 }
