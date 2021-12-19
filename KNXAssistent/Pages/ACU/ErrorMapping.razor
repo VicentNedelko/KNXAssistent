@@ -1,7 +1,168 @@
 ﻿@page "/ACU/ErrorMapping"
 
-<h3>ERROR MAPPING</h3>
+@using KNXManager.FileService
+@using KNXManager.ACU
+@using DAL.Models
+
+@inject IFileService fileService
+@inject IAcuErrorHandler acuErrorHandler
+
+<h3>ACU ERRORs MAPPING</h3>
+<br />
+@if (acuErrorHandler.ACErrors.Count() == 0)
+{
+    <Alert Color="Color.Warning">
+        <AlertMessage>Warning!</AlertMessage>
+        <AlertDescription>There is NO ACU Error added. First add Error in Mapping List.</AlertDescription>
+    </Alert>
+}
+else
+{
+    <Table FixedHeader="true" FixedHeaderTableMaxHeight="500px">
+        <TableHeader>
+            <Blazorise.TableRow>
+                <TableHeaderCell>Num</TableHeaderCell>
+                <TableHeaderCell>Brand Name</TableHeaderCell>
+                <TableHeaderCell>Error Code</TableHeaderCell>
+                <TableHeaderCell>Error Description</TableHeaderCell>
+                <TableHeaderCell>Comments</TableHeaderCell>
+                <TableHeaderCell>Edit</TableHeaderCell>
+                <TableHeaderCell>Remove</TableHeaderCell>
+            </Blazorise.TableRow>
+        </TableHeader>
+        <TableBody>
+            @foreach (var err in acuErrorHandler.ACErrors)
+            {
+                <Blazorise.TableRow>
+                    <TableRowCell>@(acuErrorHandler.ACErrors.IndexOf(err) + 1)</TableRowCell>
+                    <TableRowCell>@err.AcuBrand</TableRowCell>
+                    <TableRowCell>@err.ErrorCode</TableRowCell>
+                    <TableRowCell>@err.ErrorDescription</TableRowCell>
+                    <TableRowCell>@err.Comment</TableRowCell>
+                    <TableRowCell><MatButton Dense="true" OnClick="(() => OnEditClick(err))">Edit</MatButton></TableRowCell>
+                    <TableRowCell><MatButton Dense="true" OnClick="(() => OnRemoveClick(err))">Remove</MatButton></TableRowCell>
+                </Blazorise.TableRow>
+            }
+        </TableBody>
+    </Table>
+}
+
+<MatButton Raised="true" OnClick="OnAddNewErrorClick">ADD ERROR</MatButton>
+
+<MatDialog @bind-IsOpen="ErrDialogIsOpen">
+    <MatDialogTitle>Edit ACU Error</MatDialogTitle>
+    <MatDialogContent>
+        <p>Edit Error</p>
+        <MatSelect TValue="int" Label="Brand Name" @bind-Value="brand">
+            <MatOption Value="0">DAIKIN</MatOption>
+            <MatOption Value="1">ME</MatOption>
+            <MatOption Value="2">MHI</MatOption>
+        </MatSelect>
+        <MatTextField @bind-Value="code" Label="Error Code"></MatTextField>
+        <MatTextField @bind-Value="errDescription" Label="Error Description"></MatTextField>
+        <MatTextField @bind-Value="comment" Label="Comment"></MatTextField>
+        <MatButton Dense="true" OnClick="OnCancelEditClick">CANCEL</MatButton>
+        <MatButton Dense="true" OnClick="OnOkEditClick">OK</MatButton>
+    </MatDialogContent>
+</MatDialog>
+
+@*// Add new Error dialog*@
+
+<MatDialog @bind-IsOpen="NewDialogIsOpen">
+    <MatDialogTitle>Edit ACU Error</MatDialogTitle>
+    <MatDialogContent>
+        <p>Add new Error</p>
+        <MatSelect TValue="int" Label="Brand Name" @bind-Value="brand">
+            <MatOption Value="0">DAIKIN</MatOption>
+            <MatOption Value="1">ME</MatOption>
+            <MatOption Value="2">MHI</MatOption>
+        </MatSelect>
+        <MatTextField @bind-Value="code" Label="Error Code"></MatTextField>
+        <MatTextField @bind-Value="errDescription" Label="Error Description"></MatTextField>
+        <MatTextField @bind-Value="comment" Label="Comment"></MatTextField>
+        <MatButton Dense="true" OnClick="OnNewCancelClick">CANCEL</MatButton>
+        <MatButton Dense="true" OnClick="OnNewOkClick">OK</MatButton>
+    </MatDialogContent>
+</MatDialog>
+
 
 @code {
+    bool ErrDialogIsOpen = false;
+    bool NewDialogIsOpen = false;
+    string code = string.Empty;
+    string errDescription = string.Empty;
+    string description = string.Empty;
+    string comment = string.Empty;
+    int brand;
+    int indexError;
+
+    void OnNewCancelClick()
+    {
+        NewDialogIsOpen = false;
+        string code = string.Empty;
+        string errDescription = string.Empty;
+        string description = string.Empty;
+        string comment = string.Empty;
+    }
+
+    async Task OnNewOkClick()
+    {
+        NewDialogIsOpen = false;
+        ACError err = new ACError
+        {
+            AcuBrand = ACUnit.IntToAcuBrand(brand),
+            ErrorCode = code,
+            ErrorDescription = errDescription,
+            Comment = comment,
+        };
+        acuErrorHandler.ACErrors.Add(err);
+        await fileService.WriteAcuErrorsToFileAsync(acuErrorHandler.ACErrors);
+        StateHasChanged();
+    }
+
+
+    void OnEditClick(ACError err)
+    {
+        indexError = acuErrorHandler.ACErrors.IndexOf(err);
+        code = err.ErrorCode;
+        errDescription = err.ErrorDescription;
+        comment = err.Comment;
+        ErrDialogIsOpen = true;
+    }
+
+    void OnAddNewErrorClick()
+    {
+        string code = string.Empty;
+        string errDescription = string.Empty;
+        string description = string.Empty;
+        string comment = string.Empty;
+        NewDialogIsOpen = true;
+    }
+
+    void OnCancelEditClick()
+    {
+        string code = string.Empty;
+        string errDescription = string.Empty;
+        string description = string.Empty;
+        string comment = string.Empty;
+        ErrDialogIsOpen = false;
+    }
+
+    void OnOkEditClick()
+    {
+        ErrDialogIsOpen = false;
+        var errToEdit = acuErrorHandler.ACErrors[indexError];
+        errToEdit.AcuBrand = ACUnit.IntToAcuBrand(brand);
+        errToEdit.ErrorCode = code;
+        errToEdit.ErrorDescription = errDescription;
+        errToEdit.Comment = comment;
+        StateHasChanged();
+    }
+
+    void OnRemoveClick(ACError err)
+    {
+        acuErrorHandler.ACErrors.Remove(err);
+        StateHasChanged();
+    }
 
 }

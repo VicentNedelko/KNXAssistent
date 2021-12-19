@@ -16,7 +16,7 @@
         <MatStringField ReadOnly="true" Value="@busCommunicator.ActiveInt.Name" Label="Interface NAME"></MatStringField>
     </p>
     <p>
-        <MatStringField ReadOnly="true" Value="@busCommunicator.ActiveInt.State" Label="Interface STATE"></MatStringField>
+        <MatStringField ReadOnly="true" Value="@busCommunicator.bus.State.ToString()" Label="KNX BUS STATE"></MatStringField>
     </p>
 </Div>
 <MatDivider></MatDivider>
@@ -61,7 +61,6 @@
             <AlertDescription>No Data loaded yet.</AlertDescription>
         </Alert>
     }
-
     <MatButton Raised="true" OnClick="@OnStartClick" Disabled="startBtnDsbl">Start</MatButton>
     <MatButton Outlined="true" OnClick="@OnStopClick" Disabled="stopBtnDsbl">Stop</MatButton>
 }
@@ -83,7 +82,7 @@ else
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        if(busCommunicator.bus is not null && busCommunicator.bus.IsConnected)
+        if (busCommunicator.bus is not null && busCommunicator.bus.IsConnected)
         {
             startBtnDsbl = true;
             stopBtnDsbl = false;
@@ -98,7 +97,7 @@ else
 
     void OnStartClick()
     {
-        busCommunicator.StartMonitorAsync();
+        busCommunicator.StartMonitor();
         busCommunicator.OnGaReceived += OnNotify;
         startBtnDsbl = true;
         stopBtnDsbl = false;
@@ -115,12 +114,12 @@ else
     public async Task OnNotify()
     {
         await this.InvokeAsync(() => StateHasChanged());
-        ShowWarningNotification();
+        await ShowWarningNotification();
     }
 
     Task ShowWarningNotification()
     {
-        return NotificationService.Warning( "This is a simple notification message!", "Hello" );
+        return NotificationService.Warning("This is a simple notification message!", "Hello");
     }
 
 

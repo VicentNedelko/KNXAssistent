@@ -11,12 +11,13 @@ namespace KNXManager.FileService
         public void WriteThToFile(List<GAWithTh> gAWithThs);
         public void ClearSbcValueFile();
         public List<GAWithTh> ReadThFromFile();
-        public Task<List<GA>> ReadSbcFromFileAsync();
+        public List<GA> ReadSbcFromFile();
 
         // ACU services
         public Task<List<ACError>> ReadErrorFromFileAsync();
         public Task<List<ACUnit>> ReadACUsFromFileAsync();
         public List<ACUnit> ReadACUsFromFile();
+        public List<ACError> ReadErrorsFromFile();
         public Task WriteACUsToFileAsync(List<ACUnit> Acus);
         public Task WriteAcuErrorsToFileAsync(List<ACError> errors);
         

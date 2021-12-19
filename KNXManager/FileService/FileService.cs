@@ -19,11 +19,11 @@ namespace KNXManager.FileService
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task<List<GA>> ReadSbcFromFileAsync()
+        public List<GA> ReadSbcFromFile()
         {
             var path = Path.Combine(_webHostEnvironment.WebRootPath, "files", Secret.GASbcList);
             using StreamReader sr = new(path);
-            var jsonData = await sr.ReadToEndAsync();
+            var jsonData = sr.ReadToEnd();
             sr.Close();
             List<GA> result = new();
             try
@@ -119,18 +119,17 @@ namespace KNXManager.FileService
         public async Task WriteACUsToFileAsync(List<ACUnit> Acus)
         {
             var path = Path.Combine(_webHostEnvironment.WebRootPath, "files", Secret.AcuList);
-            using StreamWriter sw = new(path, false);
-            await JsonSerializer.SerializeAsync(sw.BaseStream, Acus);
-            await sw.WriteAsync(sw.BaseStream.ToString());
-            sw.Close();
+            using FileStream fs = new(path, FileMode.Create);
+            await JsonSerializer.SerializeAsync(fs, Acus);
+            await fs.DisposeAsync();
         }
 
         public async Task WriteAcuErrorsToFileAsync(List<ACError> errors)
         {
             var path = Path.Combine(_webHostEnvironment.WebRootPath, "files", Secret.AcuErrors);
-            using StreamWriter sw = new(path);
-            await JsonSerializer.SerializeAsync(sw.BaseStream, errors);
-            await sw.WriteAsync(sw.BaseStream.ToString());
+            using FileStream fs = new(path, FileMode.Create);
+            await JsonSerializer.SerializeAsync(fs, errors);
+            await fs.DisposeAsync();
         }
 
         public List<ACUnit> ReadACUsFromFile()
@@ -140,6 +139,26 @@ namespace KNXManager.FileService
             var jsonData = sr.ReadToEnd();
             sr.Close();
             return JsonSerializer.Deserialize<List<ACUnit>>(jsonData);
+        }
+
+        public List<ACError> ReadErrorsFromFile()
+        {
+            var path = Path.Combine(_webHostEnvironment.WebRootPath, "files", Secret.AcuErrors);
+            using StreamReader sr = new(path);
+            var json = sr.ReadToEnd();
+            return JsonSerializer.Deserialize<List<ACError>>(json);
+        }
+        
+        public async Task WriteErrorValuesToFile(List<ErrorValue> errorValues)
+        {
+            var path = Path.Combine(_webHostEnvironment.WebRootPath, "files", "ACUErrors", DateTime.Now.ToShortDateString(), Secret.AcuErrorValues);
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            using FileStream fs = new(path, FileMode.Append);
+            await JsonSerializer.SerializeAsync(fs, errorValues);
+            await fs.DisposeAsync();
         }
     }
 }

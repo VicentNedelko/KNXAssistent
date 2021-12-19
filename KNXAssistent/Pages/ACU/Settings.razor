@@ -1,26 +1,146 @@
 ﻿@page "/ACU/Settings"
 @using KNXManager.FileService
-@using KNXManager.BusConnection
 @using KNXManager.ACU
+@using DAL.Enums
+@using DAL.Models
+@using System.Text.RegularExpressions
+@using KNXManager.MessageService
+@using System.Threading
 
 @inject IFileService fileService
-@inject IBusCommunicator busCommunicator
 @inject IAcuErrorHandler acuErrorHandler
+@inject IMessService  messService
 
 <h3>ACU Settings</h3>
-@if(acuErrorHandler.ACUnits.Count() == 0)
-{
-    <Alert Color="Color.Info" Visible>
-    <AlertMessage>ACU Error Handler : </AlertMessage>
-    <AlertDescription>NO ACUs added yet. To START monitoring, please add at least one ACU.</AlertDescription>
+<br />
+<Alert Color="Color.Warning" @ref="InfoError">
+    <AlertMessage>Warning!</AlertMessage>
+    <AlertDescription>GA address type doesn't match the 3-level sample - __/__/__ @errorFlagGA OR @errorValueGA</AlertDescription>
 </Alert>
-<MatButton Raised="true" OnClick="AddACUClick"></MatButton>
+
+@if (acuErrorHandler.ACUnits.Count() == 0)
+{
+    <Alert Color="Color.Info" @bind-Visible="noACUalert">
+        <AlertMessage>ACU Error Handler : </AlertMessage>
+        <AlertDescription>NO ACUs added yet. To START monitoring, please add at least one ACU.</AlertDescription>
+    </Alert>
+}
+else
+{
+    noACUalert = false;
+    <Table FixedHeader="true" FixedHeaderTableHeight="500px">
+        <TableHeader>
+            <Blazorise.TableRow>
+                <TableHeaderCell>Num</TableHeaderCell>
+                <TableHeaderCell>Brand Name</TableHeaderCell>
+                <TableHeaderCell>Description</TableHeaderCell>
+                <TableHeaderCell>Error Flag</TableHeaderCell>
+                <TableHeaderCell>Error Value</TableHeaderCell>
+                <TableHeaderCell>REMOVE</TableHeaderCell>
+            </Blazorise.TableRow>
+        </TableHeader>
+        <TableBody>
+            @foreach(var acu in acuErrorHandler.ACUnits)
+                    {
+                        <Blazorise.TableRow>
+                            <TableRowCell>@(acuErrorHandler.ACUnits.IndexOf(acu) + 1)</TableRowCell>
+                            <TableRowCell>@acu.AcuBrand</TableRowCell>
+                            <TableRowCell>@acu.Description</TableRowCell>
+                            <TableRowCell>@acu.ErrorFlagGA</TableRowCell>
+                            <TableRowCell>@acu.ErrorValueGA</TableRowCell>
+                            <TableRowCell><MatButton Dense="true" OnClick="(() => OnRemoveClick(acu))">Remove</MatButton></TableRowCell>
+                        </Blazorise.TableRow>
+                    }
+        </TableBody>
+        </Table>
 }
 
+<MatButton Raised="true" OnClick="AddACUClick">New ACU</MatButton>
+
+<MatDialog @bind-IsOpen="AcuAddDialodIsOpen">
+    <MatDialogTitle>Add new ACU</MatDialogTitle>
+    <MatDialogContent>
+        <p>Enter new ACU</p>
+        <MatSelect TValue="int" Label="ACU Brand" @bind-Value="@brand">
+            <MatOption Value="0">DAIKIN</MatOption>
+            <MatOption Value="1">ME</MatOption>
+            <MatOption Value="2">MHI</MatOption>
+        </MatSelect>
+        <MatTextField @bind-Value="description" Label="Description"></MatTextField>
+        <MatTextField @bind-Value="errorFlagGA" Label="Error flag GA"></MatTextField>
+        <MatTextField @bind-Value="errorValueGA" Label="Error value GA"></MatTextField>
+        <MatButton OnClick="@CancelClick" Raised="true">CANCEL</MatButton><MatButton OnClick="@OkClick" Raised="true">OK</MatButton>
+    </MatDialogContent>
+</MatDialog>
+
+
+
+
+
 @code {
+    bool AcuAddDialodIsOpen = false;
+    int brand;
+    Alert InfoError;
+    bool noACUalert = true;
+    string description = string.Empty;
+    string errorFlagGA = string.Empty;
+    string errorValueGA = string.Empty;
+    Regex _regex =
+        new(@"^([0-9]|[1-9][0-9]|[1-2][0-5][0-5]){1}\/([0-9]|[1-9][0-9]|[1-2][0-5][0-5]{1})\/([0-9]|[1-9][0-9]|[1-2][0-5][0-5]){1}$");
+
     void AddACUClick()
     {
-        
+        AcuAddDialodIsOpen = true;
+    }
+
+    void CancelClick()
+    {
+        AcuAddDialodIsOpen = false;
+        description = string.Empty;
+        errorFlagGA = string.Empty;
+        errorValueGA = string.Empty;
+    }
+
+    void OnRemoveClick(ACUnit unit)
+    {
+        acuErrorHandler.ACUnits.Remove(unit);
+        StateHasChanged();
+    }
+
+    void OkClick()
+    {
+        AcuAddDialodIsOpen = false;
+        if (!String.IsNullOrEmpty(errorFlagGA) && !String.IsNullOrEmpty(errorValueGA))
+        {
+            if (_regex.IsMatch(errorFlagGA) && _regex.IsMatch(errorValueGA))
+            {
+                ACUnit acUnit = new ACUnit
+                {
+                    AcuBrand = ACUnit.IntToAcuBrand(brand),
+                    Description = description,
+                    ErrorFlagGA = errorFlagGA,
+                    ErrorValueGA = errorValueGA,
+                };
+                acuErrorHandler.ACUnits.Add(acUnit);
+                fileService.WriteACUsToFileAsync(acuErrorHandler.ACUnits);
+                StateHasChanged();
+                messService.AddInfoMessage($"New ACU {ACUnit.IntToAcuBrand(brand)} {description} added");
+            }
+        }
+        else
+        {
+            messService.AddWarningMessage($"ACU GA address type doesn't match the 3-level sample - __/__/__  - {errorFlagGA} OR {errorValueGA}");
+            Thread thread = new(new ThreadStart(() => ErrorMessageShow(2000)));
+            thread.Start();
+        }
+
+    }
+
+    void ErrorMessageShow(int period)
+    {
+        InfoError.Show();
+        Thread.Sleep(period);
+        InfoError.Hide();
     }
 
 }

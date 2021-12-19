@@ -11,5 +11,6 @@ namespace DAL.Enums
         DAIKIN,
         MITSUBISHI_ELECTRIC,
         MITSUBISHI_HEAVY,
+        UNKNOWN,
     }
 }

@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\files\Data\" />
+    <Folder Include="wwwroot\files\ACUErrors\" />
     <Folder Include="wwwroot\pictures\" />
   </ItemGroup>
 

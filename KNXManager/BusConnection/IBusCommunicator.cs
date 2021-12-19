@@ -18,7 +18,7 @@ namespace KNXManager.BusConnection
         public string CheckConnection(string interfaceIp);
         public void SetInterface(string interfaceIp);
 
-        public Task StartMonitorAsync();
+        public void StartMonitor();
         public void StopMonitor();
 
         // ACU Service

@@ -12,6 +12,7 @@ using KNXManager.MessageService;
 using System;
 using KNXManager.BotManager;
 using System.Threading.Tasks;
+using KNXManager.ACU;
 
 namespace KNXManager.BusConnection
 {
@@ -20,7 +21,8 @@ namespace KNXManager.BusConnection
         private readonly IFileService _fileService;
         private readonly IMessService _messService;
         private readonly IBot _bot;
-        private int _handlerGvrNumber;
+        private readonly IAcuErrorHandler _acuErrorHandler;
+        public int handlerGvrNumber;
         private int _handlerScNumber;
         public DiscoveryResult[] Interfaces { get; set; }
         public KnxInterface ActiveInt { get; set; } = new();
@@ -39,6 +41,7 @@ namespace KNXManager.BusConnection
             gaValues = new();
             _messService = messService;
             _bot = bot;
+            gaSbcList = _fileService.ReadSbcFromFile();
         }
 
         public string CheckConnection(string interfaceIp)
@@ -57,12 +60,12 @@ namespace KNXManager.BusConnection
             ActiveInt.State = (bus is not null) ? bus.State.ToString() : "Not connected to KNX";
         }
 
-        public async Task StartMonitorAsync()
+        public void StartMonitor()
         {
-            gaSbcList = await _fileService.ReadSbcFromFileAsync();
             LetsCommunicate();
             bus.GroupValueReceived += Bus_GroupValueSbcReceived;
-            _handlerGvrNumber++;
+            bus.GroupValueReceived += _acuErrorHandler.Bus_OnGaValueReceived;
+            handlerGvrNumber++;
             bus.StateChanged += Bus_StateChanged;
             _handlerScNumber++;
             OnGaReceived?.Invoke();
@@ -82,7 +85,7 @@ namespace KNXManager.BusConnection
 
         private void LetsStop()
         {
-            if(_handlerGvrNumber + _handlerScNumber == 0)
+            if(handlerGvrNumber + _handlerScNumber == 0)
             {
                 bus.Disconnect();
                 bus.Dispose();
@@ -99,7 +102,7 @@ namespace KNXManager.BusConnection
         public void StopMonitor()
         {
             bus.GroupValueReceived -= Bus_GroupValueSbcReceived;
-            _handlerGvrNumber--;
+            handlerGvrNumber--;
             bus.StateChanged -= Bus_StateChanged;
             _handlerScNumber--;
             LetsStop();

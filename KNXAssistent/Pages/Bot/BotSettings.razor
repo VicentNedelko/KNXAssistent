@@ -221,9 +221,9 @@ else
         dialogIsOpen = false;
     }
 
-    async Task GetGaAtStartUpAsync()
+    async void GetGaAtStartUp()
     {
-        gaSBC = await fileService.ReadSbcFromFileAsync();
+        gaSBC = fileService.ReadSbcFromFile();
     }
 
     void RemoveGA(string gaAddress)
@@ -239,9 +239,9 @@ else
         StateHasChanged();
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await GetGaAtStartUpAsync();
+        GetGaAtStartUp();
     }
 
     void TimerCount(int period)
