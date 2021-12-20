@@ -72,7 +72,7 @@ namespace KNXManager.BusConnection
             _messService.AddInfoMessage($"Start monitoring on {ActiveInt.Ip}-{ActiveInt.Name}");
         }
 
-        private void LetsCommunicate()
+        public void LetsCommunicate()
         {
             bus ??= new(new KnxIpTunnelingConnectorParameters(ActiveInt.Ip, 0x0e57, false));
             if (!bus.IsConnected)
@@ -83,7 +83,7 @@ namespace KNXManager.BusConnection
             //ConnectionState = bus?.State.ToString();
         }
 
-        private void LetsStop()
+        public void LetsStop()
         {
             if(handlerGvrNumber + _handlerScNumber == 0)
             {
