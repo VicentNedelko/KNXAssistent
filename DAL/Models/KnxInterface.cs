@@ -10,7 +10,7 @@ namespace DAL.Models
     {
         public string Ip { get; set; }
         public string Name { get; set; }
-        public string State { get; set; }
+        public string State { get; set; } = "NO BUS connection";
         public string Mac { get; set; }
         public string IndividualAddress { get; set; }
     }

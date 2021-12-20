@@ -9,21 +9,13 @@ namespace KNXManager.BusConnection
 {
     public interface IBusCommunicator
     {
+        public int handlerGvrNumber { get; set; }
+        public int handlerScNumber { get; set; }
         public DiscoveryResult[] Interfaces { get; set; }
         public KnxInterface ActiveInt { get; set; }
         public Bus bus { get; set; }
-        public List<GaValue> gaValues { get; set; }
-        public event Func<Task> OnGaReceived;
-        public string ConnectionState { get; set; }
         public string CheckConnection(string interfaceIp);
         public void SetInterface(string interfaceIp);
 
-        public void StartMonitor();
-        public void StopMonitor();
-
-        // ACU Service
-
-        public void StartACUHandler();
-        public void StopACUHandler();
     }
 }

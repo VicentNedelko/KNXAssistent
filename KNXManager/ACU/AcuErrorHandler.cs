@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DAL.Models;
 using Knx.Bus.Common;
+using Knx.Bus.Common.Configuration;
 using Knx.Bus.Common.DatapointTypes;
 using KNXManager.BusConnection;
 using KNXManager.FileService;
@@ -58,6 +59,31 @@ namespace KNXManager.ACU
                     _messService.AddDangerMessage($"Can't find ACU with Error Flag - {obj.Address}");
                 }
             }
+        }
+
+        public void StartMonitor()
+        {
+            LetsCommunicate();
+            _busCommunicator.ActiveInt.State = _busCommunicator.bus?.State.ToString();
+            _busCommunicator.bus.GroupValueReceived += Bus_OnGaValueReceived;
+            _busCommunicator.handlerGvrNumber++;
+            OnErrorReceived?.Invoke();
+            _messService.AddInfoMessage($"Start monitoring on {_busCommunicator.ActiveInt.Ip}-{_busCommunicator.ActiveInt.Name}");
+        }
+
+        public void StopMonitor()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void LetsCommunicate()
+        {
+            _busCommunicator.bus ??= new(new KnxIpTunnelingConnectorParameters(_busCommunicator.ActiveInt.Ip, 0x0e57, false));
+            if (!_busCommunicator.bus.IsConnected)
+            {
+                _busCommunicator.bus.Connect();
+            }
+            _busCommunicator.ActiveInt.State = _busCommunicator.bus?.State.ToString();
         }
     }
 }

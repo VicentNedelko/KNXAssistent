@@ -14,12 +14,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using KNXManager.MessageService;
 using KNXManager.HEOSService;
 using KNXManager.ACU;
+using KNXManager.MonitorService;
 
 namespace KNXAssistent
 {
@@ -43,6 +41,7 @@ namespace KNXAssistent
             services.AddScoped<IMessService, MessService>();
             services.AddScoped<IHeosService, HeosService>();
             services.AddScoped<IAcuErrorHandler, AcuErrorHandler>();
+            services.AddScoped<IMonitor, Monitor>();
 
             services
               .AddBlazorise(options =>

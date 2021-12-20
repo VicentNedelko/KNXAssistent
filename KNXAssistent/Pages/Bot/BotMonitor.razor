@@ -1,8 +1,10 @@
 ﻿@page "/Bot/botMonitor";
 @using DAL.Models
 @using KNXManager.BusConnection
+@using KNXManager.MonitorService
 
 @inject IBusCommunicator busCommunicator
+@inject IMonitor monitor
 
 <h4>Monitor Logger</h4>
 <br />
@@ -16,7 +18,7 @@
         <MatStringField ReadOnly="true" Value="@busCommunicator.ActiveInt.Name" Label="Interface NAME"></MatStringField>
     </p>
     <p>
-        <MatStringField ReadOnly="true" Value="@busCommunicator.bus.State.ToString()" Label="KNX BUS STATE"></MatStringField>
+        <MatStringField ReadOnly="true" Value="@busCommunicator.ActiveInt.State" Label="KNX BUS STATE"></MatStringField>
     </p>
 </Div>
 <MatDivider></MatDivider>
@@ -24,7 +26,7 @@
 
 @if (!String.IsNullOrEmpty(busCommunicator.ActiveInt.Ip))
 {
-    @if (busCommunicator.gaValues.Count() != 0)
+    @if (monitor.gaValues.Count() != 0)
     {
 
 
@@ -40,10 +42,10 @@
                 </Blazorise.TableRow>
             </TableHeader>
             <TableBody>
-                @foreach (var v in busCommunicator.gaValues)
+                @foreach (var v in monitor.gaValues)
                 {
                     <Blazorise.TableRow>
-                        <TableRowHeader>@(busCommunicator.gaValues.IndexOf(v) + 1)</TableRowHeader>
+                        <TableRowHeader>@(monitor.gaValues.IndexOf(v) + 1)</TableRowHeader>
                         <TableRowCell>@v.Description</TableRowCell>
                         <TableRowCell>@v.Address</TableRowCell>
                         <TableRowCell>@v.Value</TableRowCell>
@@ -97,18 +99,18 @@ else
 
     void OnStartClick()
     {
-        busCommunicator.StartMonitor();
-        busCommunicator.OnGaReceived += OnNotify;
+        monitor.StartMonitor();
+        monitor.OnGaReceived += OnNotify;
         startBtnDsbl = true;
         stopBtnDsbl = false;
     }
 
     void OnStopClick()
     {
-        busCommunicator.StopMonitor();
+        monitor.StopMonitor();
         startBtnDsbl = false;
         stopBtnDsbl = true;
-        busCommunicator.OnGaReceived -= OnNotify;
+        monitor.OnGaReceived -= OnNotify;
     }
 
     public async Task OnNotify()
