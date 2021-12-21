@@ -33,6 +33,7 @@ namespace KNXManager.MonitorService
             _busCommunicator = busCommunicator;
             _messService = messService;
             gaSbcList = _fileService.ReadSbcFromFile();
+            gaValues = new();
         }
 
         public void Bus_GroupValueSbcReceived(GroupValueEventArgs obj)
@@ -84,7 +85,6 @@ namespace KNXManager.MonitorService
         {
             _busCommunicator.bus.GroupValueReceived -= Bus_GroupValueSbcReceived;
             _busCommunicator.handlerGvrNumber--;
-            _busCommunicator.handlerScNumber--;
             LetsStop();
             _fileService.WriteSbcValueToFile(gaValues);
             _messService.AddInfoMessage($"Stop monitoring on {_busCommunicator.ActiveInt.Ip}-{_busCommunicator.ActiveInt.Name}");

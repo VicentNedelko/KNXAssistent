@@ -35,9 +35,9 @@ namespace KNXManager.ACU
             ErrorValues = new();
         }
 
-        public void Bus_OnGaValueReceived(GroupValueEventArgs obj)
+        public void Bus_OnACUerrorValueReceived(GroupValueEventArgs obj)
         {
-            if(ACUnits.Any(unit => unit.ErrorFlagGA == obj.Address) && (bool)obj.Value == true)
+            if(ACUnits.Any(unit => unit.ErrorFlagGA == obj.Address))
             {
                 var ACunit = ACUnits.FirstOrDefault(unit => unit.ErrorFlagGA == obj.Address);
                 if(ACunit is not null)
@@ -65,7 +65,7 @@ namespace KNXManager.ACU
         {
             LetsCommunicate();
             _busCommunicator.ActiveInt.State = _busCommunicator.bus?.State.ToString();
-            _busCommunicator.bus.GroupValueReceived += Bus_OnGaValueReceived;
+            _busCommunicator.bus.GroupValueReceived += Bus_OnACUerrorValueReceived;
             _busCommunicator.handlerGvrNumber++;
             OnErrorReceived?.Invoke();
             _messService.AddInfoMessage($"Start monitoring on {_busCommunicator.ActiveInt.Ip}-{_busCommunicator.ActiveInt.Name}");
@@ -73,7 +73,11 @@ namespace KNXManager.ACU
 
         public void StopMonitor()
         {
-            throw new NotImplementedException();
+            _busCommunicator.bus.GroupValueReadReceived -= Bus_OnACUerrorValueReceived;
+            _busCommunicator.handlerGvrNumber--;
+            LetsStop();
+            _fileService.WriteErrorValuesToFileAsync(ErrorValues);
+
         }
 
         private void LetsCommunicate()
@@ -84,6 +88,15 @@ namespace KNXManager.ACU
                 _busCommunicator.bus.Connect();
             }
             _busCommunicator.ActiveInt.State = _busCommunicator.bus?.State.ToString();
+        }
+
+        private void LetsStop()
+        {
+            if (_busCommunicator.handlerGvrNumber + _busCommunicator.handlerScNumber == 0)
+            {
+                _busCommunicator.bus.Disconnect();
+                _busCommunicator.bus.Dispose();
+            }
         }
     }
 }

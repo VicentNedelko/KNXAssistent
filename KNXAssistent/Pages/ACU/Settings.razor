@@ -101,9 +101,10 @@ else
         errorValueGA = string.Empty;
     }
 
-    void OnRemoveClick(ACUnit unit)
+    async void OnRemoveClick(ACUnit unit)
     {
         acuErrorHandler.ACUnits.Remove(unit);
+        await fileService.WriteACUsToFileAsync(acuErrorHandler.ACUnits);
         StateHasChanged();
     }
 

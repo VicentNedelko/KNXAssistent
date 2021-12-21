@@ -13,7 +13,7 @@ namespace KNXManager.ACU
         public List<ACUnit> ACUnits { get; set; }
         public List<ACError> ACErrors { get; set; }
         public List<ErrorValue> ErrorValues { get; set; }
-        public void Bus_OnGaValueReceived(GroupValueEventArgs obj);
+        public void Bus_OnACUerrorValueReceived(GroupValueEventArgs obj);
         public event Func<Task> OnErrorReceived;
 
         public void StartMonitor();

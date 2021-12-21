@@ -1,7 +1,115 @@
 ﻿@page "/ACU/monitor"
+@using KNXManager.BusConnection
+@using KNXManager.ACU
 
-<h3>ACUmonitor</h3>
+@inject IBusCommunicator busCommunicator
+@inject IAcuErrorHandler acuErrorHandler
+
+<h3>ACU Errors monitor</h3>
+<MatDivider></MatDivider>
+<Div>
+    <p>Active Interface</p>
+    <p>
+        <MatStringField ReadOnly="true" Value="@busCommunicator.ActiveInt.Ip" Label="Interface IP"></MatStringField>
+    </p>
+    <p>
+        <MatStringField ReadOnly="true" Value="@busCommunicator.ActiveInt.Name" Label="Interface NAME"></MatStringField>
+    </p>
+    <p>
+        <MatStringField ReadOnly="true" Value="@busCommunicator.ActiveInt.State" Label="KNX BUS STATE"></MatStringField>
+    </p>
+</Div>
+<MatDivider></MatDivider>
+
+@if (acuErrorHandler.ErrorValues.Count() != 0)
+{
+    <Table FixedHeader="true" FixedHeaderTableHeight="500px">
+        <TableHeader>
+            <Blazorise.TableRow>
+                <TableHeaderCell>Num</TableHeaderCell>
+                <TableHeaderCell>Brand Name</TableHeaderCell>
+                <TableHeaderCell>ACU Description</TableHeaderCell>
+                <TableHeaderCell>Time</TableHeaderCell>
+                <TableHeaderCell>Error</TableHeaderCell>
+            </Blazorise.TableRow>
+        </TableHeader>
+        <TableBody>
+            @foreach (var e in acuErrorHandler.ErrorValues)
+            {
+                <Blazorise.TableRow>
+                    <TableRowCell>@(acuErrorHandler.ErrorValues.IndexOf(e) + 1)</TableRowCell>
+                    <TableRowCell>@e.BrandName</TableRowCell>
+                    <TableRowCell>@e.AcuDescription</TableRowCell>
+                    <TableRowCell>@e.TimeStamp</TableRowCell>
+                    <TableRowCell>@e.Value</TableRowCell>
+                </Blazorise.TableRow>
+            }
+        </TableBody>
+    </Table>
+}
+else
+{
+    <Alert Color="Color.Warning" Visible>
+        <AlertMessage>ACU Error Handler.</AlertMessage>
+        <AlertDescription>No Errors has been detected yet.</AlertDescription>
+    </Alert>
+}
+
+@if (busCommunicator.ActiveInt.Ip is not null)
+{
+    <MatDivider></MatDivider>
+    <MatButton Raised="true" OnClick="OnStartClick" Disabled="@startBtnDsbl">START</MatButton>
+    <MatButton Raised="true" OnClick="OnStopClick" Disabled="@stopBtnDsbl">STOP</MatButton>
+}
+else
+{
+    <Alert Color="Color.Warning" Visible>
+        <AlertMessage>ACU Error Handler.</AlertMessage>
+        <AlertDescription>No KNX Interface has been detected. Please, choose one before.</AlertDescription>
+    </Alert>
+}
 
 @code {
+    bool startBtnDsbl = false;
+    bool stopBtnDsbl = false;
+
+
+    void OnStartClick()
+    {
+        acuErrorHandler.StartMonitor();
+        acuErrorHandler.OnErrorReceived += OnInvoke;
+        startBtnDsbl = true;
+        stopBtnDsbl = false;
+        StateHasChanged();
+    }
+
+    void OnStopClick()
+    {
+        acuErrorHandler.StopMonitor();
+        acuErrorHandler.OnErrorReceived -= OnInvoke;
+        startBtnDsbl = false;
+        stopBtnDsbl = true;
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (busCommunicator.bus is not null && busCommunicator.bus.IsConnected)
+        {
+            startBtnDsbl = true;
+            stopBtnDsbl = false;
+        }
+        else
+        {
+            startBtnDsbl = false;
+            stopBtnDsbl = true;
+        }
+    }
+
+    async Task OnInvoke()
+    {
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
 
 }
