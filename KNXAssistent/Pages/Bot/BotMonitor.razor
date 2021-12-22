@@ -84,7 +84,7 @@ else
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        if (busCommunicator.bus is not null && busCommunicator.bus.IsConnected)
+        if (busCommunicator.handlerGvrNumber > 0)
         {
             startBtnDsbl = true;
             stopBtnDsbl = false;
@@ -103,6 +103,7 @@ else
         monitor.OnGaReceived += OnNotify;
         startBtnDsbl = true;
         stopBtnDsbl = false;
+        StateHasChanged();
     }
 
     void OnStopClick()
@@ -111,6 +112,7 @@ else
         startBtnDsbl = false;
         stopBtnDsbl = true;
         monitor.OnGaReceived -= OnNotify;
+        StateHasChanged();
     }
 
     public async Task OnNotify()

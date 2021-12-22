@@ -11,6 +11,7 @@ namespace KNXManager.BusConnection
     {
         public int handlerGvrNumber { get; set; }
         public int handlerScNumber { get; set; }
+        public int handlerAcuNumber { get; set; }
         public DiscoveryResult[] Interfaces { get; set; }
         public KnxInterface ActiveInt { get; set; }
         public Bus bus { get; set; }

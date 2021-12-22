@@ -6,6 +6,7 @@
 @using System.Text.RegularExpressions
 @using KNXManager.MessageService
 @using System.Threading
+@using Knx.Bus.Common
 
 @inject IFileService fileService
 @inject IAcuErrorHandler acuErrorHandler
@@ -46,8 +47,8 @@ else
                             <TableRowCell>@(acuErrorHandler.ACUnits.IndexOf(acu) + 1)</TableRowCell>
                             <TableRowCell>@acu.AcuBrand</TableRowCell>
                             <TableRowCell>@acu.Description</TableRowCell>
-                            <TableRowCell>@acu.ErrorFlagGA</TableRowCell>
-                            <TableRowCell>@acu.ErrorValueGA</TableRowCell>
+                            <TableRowCell>@acu.ErrorFlagGA.ToString("G3")</TableRowCell>
+                            <TableRowCell>@acu.ErrorValueGA.ToString("G3")</TableRowCell>
                             <TableRowCell><MatButton Dense="true" OnClick="(() => OnRemoveClick(acu))">Remove</MatButton></TableRowCell>
                         </Blazorise.TableRow>
                     }
@@ -119,8 +120,8 @@ else
                 {
                     AcuBrand = ACUnit.IntToAcuBrand(brand),
                     Description = description,
-                    ErrorFlagGA = errorFlagGA,
-                    ErrorValueGA = errorValueGA,
+                    ErrorFlagGA = new GroupAddress(errorFlagGA),
+                    ErrorValueGA = new GroupAddress(errorValueGA),
                 };
                 acuErrorHandler.ACUnits.Add(acUnit);
                 fileService.WriteACUsToFileAsync(acuErrorHandler.ACUnits);

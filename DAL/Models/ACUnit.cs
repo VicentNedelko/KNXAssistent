@@ -1,8 +1,11 @@
-﻿using DAL.Enums;
+﻿using DAL.Converters;
+using DAL.Enums;
+using Knx.Bus.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace DAL.Models
@@ -11,8 +14,11 @@ namespace DAL.Models
     {
         public ACUBrand AcuBrand { get; set; }
         public string Description { get; set; }
-        public string ErrorFlagGA { get; set; }
-        public string ErrorValueGA { get; set; }
+        [JsonConverter(typeof(GAJsonConverter))]
+        public GroupAddress ErrorFlagGA { get; set; }
+
+        [JsonConverter(typeof(GAJsonConverter))]
+        public GroupAddress ErrorValueGA { get; set; }
 
         public static ACUBrand IntToAcuBrand(int code)
         {

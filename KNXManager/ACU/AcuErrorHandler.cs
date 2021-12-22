@@ -37,26 +37,29 @@ namespace KNXManager.ACU
 
         public void Bus_OnACUerrorValueReceived(GroupValueEventArgs obj)
         {
-            if(ACUnits.Any(unit => unit.ErrorFlagGA == obj.Address))
+            if (ACUnits.Any(unit => unit.ErrorFlagGA == obj.Address))
             {
-                var ACunit = ACUnits.FirstOrDefault(unit => unit.ErrorFlagGA == obj.Address);
-                if(ACunit is not null)
+                if ((bool)obj.Value == true)
                 {
-                    var rawCode = _busCommunicator.bus.ReadValue(ACunit.ErrorValueGA);
-                    var textCode = new Dpt16(Encoding.ASCII).ToValue(rawCode);
-                    ErrorValues.Add(new ErrorValue
+                    var ACunit = ACUnits.FirstOrDefault(unit => unit.ErrorFlagGA == obj.Address);
+                    if (ACunit is not null)
                     {
-                        BrandName = ACunit.AcuBrand,
-                        AcuDescription = ACunit.Description,
-                        TimeStamp = DateTime.Now,
-                        Value = (textCode is not null) ? ACError.GetCodeDescription(textCode.ToString()) : "Can't get CODE. Raw is NULL.",
-                    });
-                    _messService.AddInfoMessage($"ACU - {ACunit.Description} caught error with value - {ACError.GetCodeDescription(textCode.ToString())}");
-                    OnErrorReceived?.Invoke();
-                }
-                else
-                {
-                    _messService.AddDangerMessage($"Can't find ACU with Error Flag - {obj.Address}");
+                        var rawCode = _busCommunicator.bus.ReadValue(ACunit.ErrorValueGA);
+                        var textCode = new Dpt16(Encoding.ASCII).ToValue(rawCode);
+                        ErrorValues.Add(new ErrorValue
+                        {
+                            BrandName = ACunit.AcuBrand,
+                            AcuDescription = ACunit.Description,
+                            TimeStamp = DateTime.Now,
+                            Value = (textCode is not null) ? ACError.GetCodeDescription(textCode.ToString()) : "Can't get CODE. Raw is NULL.",
+                        });
+                        _messService.AddInfoMessage($"ACU - {ACunit.Description} caught error with value - {ACError.GetCodeDescription(textCode.ToString())}");
+                        OnErrorReceived?.Invoke();
+                    }
+                    else
+                    {
+                        _messService.AddDangerMessage($"Can't find ACU with Error Flag - {obj.Address}");
+                    }
                 }
             }
         }
@@ -66,17 +69,17 @@ namespace KNXManager.ACU
             LetsCommunicate();
             _busCommunicator.ActiveInt.State = _busCommunicator.bus?.State.ToString();
             _busCommunicator.bus.GroupValueReceived += Bus_OnACUerrorValueReceived;
-            _busCommunicator.handlerGvrNumber++;
-            OnErrorReceived?.Invoke();
-            _messService.AddInfoMessage($"Start monitoring on {_busCommunicator.ActiveInt.Ip}-{_busCommunicator.ActiveInt.Name}");
+            _busCommunicator.handlerAcuNumber++;
+            _messService.AddInfoMessage($"Start ACU monitoring on {_busCommunicator.ActiveInt.Ip}-{_busCommunicator.ActiveInt.Name}");
         }
 
         public void StopMonitor()
         {
             _busCommunicator.bus.GroupValueReadReceived -= Bus_OnACUerrorValueReceived;
-            _busCommunicator.handlerGvrNumber--;
+            _busCommunicator.handlerAcuNumber--;
             LetsStop();
             _fileService.WriteErrorValuesToFileAsync(ErrorValues);
+            _messService.AddInfoMessage($"Stop ACU monitoring on {_busCommunicator.ActiveInt.Ip}-{_busCommunicator.ActiveInt.Name}");
 
         }
 

@@ -25,6 +25,7 @@ namespace KNXManager.BusConnection
         public string Information { get; set; }
         public int handlerGvrNumber { get; set; }
         public int handlerScNumber { get; set; }
+        public int handlerAcuNumber { get; set; }
 
         public BusCommunicator(IMessService messService)
         {

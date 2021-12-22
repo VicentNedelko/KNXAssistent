@@ -95,7 +95,7 @@ else
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        if (busCommunicator.bus is not null && busCommunicator.bus.IsConnected)
+        if (busCommunicator.handlerAcuNumber > 0)
         {
             startBtnDsbl = true;
             stopBtnDsbl = false;

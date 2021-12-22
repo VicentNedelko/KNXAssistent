@@ -76,9 +76,8 @@ namespace KNXManager.MonitorService
             _busCommunicator.ActiveInt.State = _busCommunicator.bus?.State.ToString();
             _busCommunicator.bus.GroupValueReceived += Bus_GroupValueSbcReceived;
             _busCommunicator.handlerGvrNumber++;
-            _busCommunicator.handlerScNumber++;
             OnGaReceived?.Invoke();
-            _messService.AddInfoMessage($"Start monitoring on {_busCommunicator.ActiveInt.Ip}-{_busCommunicator.ActiveInt.Name}");
+            _messService.AddInfoMessage($"Start SBC monitoring on {_busCommunicator.ActiveInt.Ip}-{_busCommunicator.ActiveInt.Name}");
         }
 
         public void StopMonitor()
@@ -87,7 +86,7 @@ namespace KNXManager.MonitorService
             _busCommunicator.handlerGvrNumber--;
             LetsStop();
             _fileService.WriteSbcValueToFile(gaValues);
-            _messService.AddInfoMessage($"Stop monitoring on {_busCommunicator.ActiveInt.Ip}-{_busCommunicator.ActiveInt.Name}");
+            _messService.AddInfoMessage($"Stop SBC monitoring on {_busCommunicator.ActiveInt.Ip}-{_busCommunicator.ActiveInt.Name}");
         }
 
         private void LetsCommunicate()
@@ -97,7 +96,6 @@ namespace KNXManager.MonitorService
             {
                 _busCommunicator.bus.Connect();
             }
-            _busCommunicator.ActiveInt.State = _busCommunicator.bus?.State.ToString();
         }
 
         private void LetsStop()
