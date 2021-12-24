@@ -11,9 +11,6 @@ namespace KNXManager.HS
         public string HostIp { get; set; }
         public string Login { get; set; }
         public string Pass { get; set; }
-        public string ListType { get; set; }
-        public string GetLoginActions();
-        public string GetBuddyActions();
-        public string GetDebugPage();
+        public Task<string> GetActionsAsync(string type);
     }
 }

@@ -1,0 +1,63 @@
+﻿@page "/HS/Index"
+@using KNXManager.HS
+
+@inject IHsService hsService
+
+<h3>HS4 Settings</h3>
+
+<br />
+<Field Horizontal="true">
+    <FieldLabel ColumnSize="ColumnSize.Is2" TextAlignment="TextAlignment.End">HOST IP</FieldLabel>
+    <FieldBody ColumnSize="ColumnSize.Is4">
+        <InputMask Mask="999.999.9.999" @bind-Value="hostIp"></InputMask>
+    </FieldBody>
+</Field>
+<Field Horizontal="true">
+    <FieldLabel ColumnSize="ColumnSize.Is2" TextAlignment="TextAlignment.End">LOGIN</FieldLabel>
+    <FieldBody ColumnSize="ColumnSize.Is4">
+        <TextEdit Placeholder="Login" @bind-Text="login" Role="TextRole.Text" />
+    </FieldBody>
+</Field>
+<Field Horizontal="true">
+    <FieldLabel ColumnSize="ColumnSize.Is2" TextAlignment="TextAlignment.End">PASSWORD</FieldLabel>
+    <FieldBody ColumnSize="ColumnSize.Is4">
+        <TextEdit Placeholder="Password" @bind-Text="pass" Role="TextRole.Password"></TextEdit>
+    </FieldBody>
+</Field>
+<Field Horizontal="true">
+    <FieldLabel ColumnSize="ColumnSize.Is2" Visibility="Visibility.None"></FieldLabel>
+    <FieldBody ColumnSize="ColumnSize.Is4">
+        <MatButton Outlined="true" OnClick="OnHsSettingsOkClick">Set</MatButton>
+    </FieldBody>
+</Field>
+<MatDivider></MatDivider>
+<div>@loginList</div>
+<MatButton OnClick="OnLoadClick">LOAD</MatButton>
+
+
+@code {
+    string hostIp;
+    string login;
+    string pass;
+    string loginList;
+    string loginListContent;
+
+    void OnHsSettingsOkClick()
+    {
+        hsService.HostIp = hostIp;
+        hsService.Login = login;
+        hsService.Pass = pass;
+    }
+
+    async Task OnLoadClick()
+    {
+        loginList = await hsService.GetActionsAsync("login");
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        loginList = string.Empty;
+    }
+}

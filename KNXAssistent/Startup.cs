@@ -18,6 +18,7 @@ using KNXManager.MessageService;
 using KNXManager.HEOSService;
 using KNXManager.ACU;
 using KNXManager.MonitorService;
+using KNXManager.HS;
 
 namespace KNXAssistent
 {
@@ -42,6 +43,7 @@ namespace KNXAssistent
             services.AddScoped<IHeosService, HeosService>();
             services.AddScoped<IAcuErrorHandler, AcuErrorHandler>();
             services.AddScoped<IMonitor, Monitor>();
+            services.AddScoped<IHsService, HsService>();
 
             services
               .AddBlazorise(options =>
