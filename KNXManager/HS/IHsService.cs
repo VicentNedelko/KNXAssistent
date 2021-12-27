@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DAL.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,8 @@ namespace KNXManager.HS
         public string HostIp { get; set; }
         public string Login { get; set; }
         public string Pass { get; set; }
-        public Task<string> GetActionsAsync(string type);
+        public Task<string> GetLoginActionsAsync();
+        public string[] GetParsedLoginActions(string logData);
+        public LogInfo[] GetLogValues(string[] parsedLogins);
     }
 }

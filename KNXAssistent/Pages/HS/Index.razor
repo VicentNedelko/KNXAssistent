@@ -9,7 +9,7 @@
 <Field Horizontal="true">
     <FieldLabel ColumnSize="ColumnSize.Is2" TextAlignment="TextAlignment.End">HOST IP</FieldLabel>
     <FieldBody ColumnSize="ColumnSize.Is4">
-        <InputMask Mask="999.999.9.999" @bind-Value="hostIp"></InputMask>
+        <TextEdit Placeholder="IP address" @bind-Text="hostIp"></TextEdit>
     </FieldBody>
 </Field>
 <Field Horizontal="true">
@@ -32,7 +32,7 @@
 </Field>
 <MatDivider></MatDivider>
 <div>@loginList</div>
-<MatButton OnClick="OnLoadClick">LOAD</MatButton>
+<MatButton OnClick="OnLoadClick" Disabled="@loadDsbl">LOAD</MatButton>
 
 
 @code {
@@ -41,23 +41,43 @@
     string pass;
     string loginList;
     string loginListContent;
+    bool loadDsbl;
 
     void OnHsSettingsOkClick()
     {
         hsService.HostIp = hostIp;
         hsService.Login = login;
         hsService.Pass = pass;
+        if (String.IsNullOrEmpty(hostIp) || String.IsNullOrEmpty(login) || String.IsNullOrEmpty(pass))
+        {
+            loadDsbl = true;
+        }
+        else
+        {
+            loadDsbl = false;
+        }
+        StateHasChanged();
     }
 
     async Task OnLoadClick()
     {
-        loginList = await hsService.GetActionsAsync("login");
+        loginList = await hsService.GetLoginActionsAsync();
         StateHasChanged();
+        var parsedLogins = hsService.GetParsedLoginActions(loginList);
+        var logActionsArray = hsService.GetLogValues(parsedLogins);
     }
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
         loginList = string.Empty;
+        if (String.IsNullOrEmpty(hostIp) || String.IsNullOrEmpty(login) || String.IsNullOrEmpty(pass))
+        {
+            loadDsbl = true;
+        }
+        else
+        {
+            loadDsbl = false;
+        }
     }
 }
