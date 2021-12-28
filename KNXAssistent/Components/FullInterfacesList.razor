@@ -4,30 +4,46 @@
 
 <h4>KNX Interfaces List</h4>
 
-    @if(Interfaces.Count() != 0)
-    {
-        <MatList>
-            @foreach (var i in Interfaces)
+    @if (Interfaces.Count() != 0)
+{
+    <MatList>
+        @foreach (var i in Interfaces)
+        {
+            <MatListItem>
+                IP Address - @i.Ip
+            </MatListItem>
+            <MatListItem>
+                Name - @i.Name
+            </MatListItem>
+            <MatListItem>
+                MAC - @i.Mac
+            </MatListItem>
+            <MatListItem>
+                State - @i.State
+            </MatListItem>
+            @if (i.State == "Ok")
             {
-                <MatListItem>
-                    IP Address - @i.Ip
-                </MatListItem>
-                <MatListItem>
-                    Name - @i.Name
-                </MatListItem>
-                <MatListItem>
-                    MAC - @i.Mac
-                </MatListItem>
-                <MatListItem>
-                    State - @i.State
-                </MatListItem>
-                <MatButton Raised="true" OnClick="@(() => OnBtnSelectPress(i.Ip))">Select</MatButton>            }
-        </MatList>
-    }
-    else
-    {
-        <p>No Interfaces found.</p>
-    }
+                <MatButton Raised="true" OnClick="@(() => OnBtnSelectPress(i.Ip))">Select</MatButton>
+            }
+            else
+            {
+                <Alert Color="Color.Warning">
+                    <AlertDescription>
+                        Unable to use it as KNX-interface.
+                    </AlertDescription>
+                    <AlertMessage>
+                        Alert.
+                    </AlertMessage>
+                    <CloseButton />
+                </Alert>
+            }
+        }
+    </MatList>
+}
+else
+{
+    <p>No Interfaces found.</p>
+}
 
 
 

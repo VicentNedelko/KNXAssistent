@@ -31,7 +31,7 @@
 else
 {
     <div class="alert alert-info" role="alert">
-        No messages yet.
+        No messages has been loaded yet.
     </div>
 }
 
@@ -50,7 +50,6 @@ else
     {
         base.OnInitialized();
         messService.Notify += OnNotify;
-
     }
     public async Task OnNotify()
     {

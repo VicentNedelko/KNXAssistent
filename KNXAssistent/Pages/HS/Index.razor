@@ -1,5 +1,6 @@
 ﻿@page "/HS/Index"
 @using KNXManager.HS
+@using DAL.Models
 
 @inject IHsService hsService
 
@@ -30,9 +31,41 @@
         <MatButton Outlined="true" OnClick="OnHsSettingsOkClick">Set</MatButton>
     </FieldBody>
 </Field>
-<MatDivider></MatDivider>
-<div>@loginList</div>
-<MatButton OnClick="OnLoadClick" Disabled="@loadDsbl">LOAD</MatButton>
+<MatDivider></MatDivider><br />
+<div>@hsService.Error</div>
+@if(logActionsArray is not null)
+{
+    <Table FixedHeader="true" FixedHeaderTableHeight=500px>
+        <TableHeader>
+            <Blazorise.TableRow>
+                <TableHeaderCell>Num</TableHeaderCell>
+                <TableHeaderCell>Time Stamp</TableHeaderCell>
+                <TableHeaderCell>User</TableHeaderCell>
+                <TableHeaderCell>IP</TableHeaderCell>
+                <TableHeaderCell>Auth</TableHeaderCell>
+                <TableHeaderCell>Loc</TableHeaderCell>
+                <TableHeaderCell>Client</TableHeaderCell>
+                <TableHeaderCell>List Type</TableHeaderCell>
+            </Blazorise.TableRow>
+        </TableHeader>
+        <TableBody>
+            @foreach(var l in logActionsArray)
+            {
+                <Blazorise.TableRow>
+                    <TableRowCell>@(logActionsArray.IndexOf(l) + 1)</TableRowCell>
+                    <TableRowCell>@l.TimeStamp</TableRowCell>
+                    <TableRowCell>@l.UserName</TableRowCell>
+                    <TableRowCell>@l.IP</TableRowCell>
+                    <TableRowCell>@l.Auth</TableRowCell>
+                    <TableRowCell>@l.Loc</TableRowCell>
+                    <TableRowCell>@l.Client</TableRowCell>
+                    <TableRowCell>@l.ListType</TableRowCell>
+                </Blazorise.TableRow>
+            }
+        </TableBody>
+    </Table>
+}
+<MatButton OnClick="OnLoadClick" Outlined="true" Disabled="@loadDsbl">LOAD</MatButton>
 
 
 @code {
@@ -42,6 +75,7 @@
     string loginList;
     string loginListContent;
     bool loadDsbl;
+    LogInfo[] logActionsArray;
 
     void OnHsSettingsOkClick()
     {
@@ -64,7 +98,7 @@
         loginList = await hsService.GetLoginActionsAsync();
         StateHasChanged();
         var parsedLogins = hsService.GetParsedLoginActions(loginList);
-        var logActionsArray = hsService.GetLogValues(parsedLogins);
+        logActionsArray = hsService.GetLogValues(parsedLogins);
     }
 
     protected override void OnInitialized()

@@ -37,7 +37,14 @@ namespace KNXManager.BusConnection
         public string CheckConnection(string interfaceIp)
         {
             using Bus bus_check = new(new KnxIpTunnelingConnectorParameters(interfaceIp, 0x0e57, false));
-            bus_check.Connect();
+            try
+            {
+                bus_check.Connect();
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
             return bus_check.CheckCommunication().ToString();
         }
 

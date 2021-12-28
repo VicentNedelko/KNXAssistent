@@ -12,6 +12,7 @@ namespace KNXManager.HS
         public string HostIp { get; set; }
         public string Login { get; set; }
         public string Pass { get; set; }
+        public string Error { get; set; }
         public Task<string> GetLoginActionsAsync();
         public string[] GetParsedLoginActions(string logData);
         public LogInfo[] GetLogValues(string[] parsedLogins);

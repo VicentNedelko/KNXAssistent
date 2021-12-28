@@ -15,6 +15,7 @@ namespace KNXManager.HS
         public string UserName { get; set; }
         public string Login { get; set; }
         public string Pass { get; set; }
+        public string Error { get; set; }
 
 
         public async Task<string> GetLoginActionsAsync()
@@ -31,9 +32,15 @@ namespace KNXManager.HS
             values.Add("pw", Pass);
             var content = new FormUrlEncodedContent(values);
             HttpResponseMessage response = await httpClient.PostAsync(uri, content);
-            response.EnsureSuccessStatusCode();
-            var result = await response.Content.ReadAsStringAsync();
-            return result;
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                Error = string.Empty;
+                return result;
+            }
+            Error = string.Concat("Error : ", response.ReasonPhrase, " ", "Status : ", response.StatusCode);
+            return string.Empty;
+
         }
 
         public string[] GetParsedLoginActions(string logData)
